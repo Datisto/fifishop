@@ -1,6 +1,6 @@
 const Hero = () => {
   return (
-    <section className="relative h-[600px] overflow-hidden">
+    <section className="relative h-[480px] overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-slate-900/60 via-slate-900/40 to-transparent"></div>
 
       <div className="relative container mx-auto px-4 h-full flex flex-col justify-center">

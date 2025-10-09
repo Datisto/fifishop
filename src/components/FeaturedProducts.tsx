@@ -53,12 +53,12 @@ const FeaturedProducts = () => {
   ];
 
   return (
-    <section className="bg-slate-900/60 backdrop-blur-md py-16">
+    <section className="relative bg-gradient-to-b from-slate-800/0 via-slate-900/40 to-slate-900 py-24">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-slate-900 inline-block relative">
+        <div className="text-center mb-16">
+          <h2 className="text-5xl font-bold text-white inline-block relative drop-shadow-lg">
             FEATURED PRODUCTS
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 mt-2"></div>
+            <div className="absolute -bottom-3 left-0 right-0 h-1.5 bg-yellow-400 rounded-full shadow-lg"></div>
           </h2>
         </div>
 
