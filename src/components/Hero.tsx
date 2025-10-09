@@ -1,7 +1,7 @@
 const Hero = () => {
   return (
     <section className="relative h-[480px] overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-900/30 via-slate-900/20 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-900/30 via-slate-900/20 to-transparent rounded-3xl"></div>
 
       <div className="relative container mx-auto px-4 h-full flex flex-col justify-center">
         <div className="max-w-2xl space-y-6">
