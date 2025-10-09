@@ -33,7 +33,7 @@ const PromotionalTiles = () => {
         {tiles.map((tile, index) => (
           <div
             key={index}
-            className="relative h-60 rounded-lg overflow-hidden shadow-xl group cursor-pointer"
+            className="relative h-40 rounded-lg overflow-hidden shadow-xl group cursor-pointer"
           >
             <div
               className="absolute inset-0 bg-cover transition-transform duration-500 group-hover:scale-110"
