@@ -13,7 +13,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+    <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
       <div className="relative h-64 overflow-hidden bg-slate-200">
         <img
           src={product.image}
@@ -21,7 +21,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
         />
         {product.onSale && (
-          <div className="absolute top-4 right-4 bg-red-600 text-white font-bold px-4 py-2 rounded-lg shadow-lg">
+          <div className="absolute top-4 right-4 bg-red-600 text-white font-bold px-4 py-2 rounded-xl shadow-lg backdrop-blur-sm">
             SALE
           </div>
         )}
@@ -41,7 +41,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             ${product.price.toFixed(2)}
           </span>
 
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl transition-colors duration-200 shadow-md hover:shadow-lg">
             VIEW
           </button>
         </div>
