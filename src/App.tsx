@@ -13,7 +13,7 @@ function App() {
           zIndex: -1
         }}
       />
-      <div className="relative backdrop-blur-md">
+      <div className="relative backdrop-blur-xl">
         <Header />
         <Hero />
         <PromotionalTiles />
