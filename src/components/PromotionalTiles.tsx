@@ -18,7 +18,7 @@ const PromotionalTiles = () => {
   ];
 
   return (
-    <section className="container mx-auto px-4 py-16 bg-slate-900/20 backdrop-blur-lg rounded-3xl">
+    <section className="container mx-auto px-4 py-16 bg-slate-900/20 rounded-3xl">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {tiles.map((tile, index) => (
           <div

@@ -5,7 +5,7 @@ const Hero = () => {
 
       <div className="relative container mx-auto px-4 h-full flex flex-col justify-center">
         <div className="max-w-2xl space-y-6">
-          <div className="bg-yellow-500 text-slate-900 inline-block px-6 py-3 rounded-2xl font-bold text-lg shadow-lg backdrop-blur-sm">
+          <div className="bg-yellow-500 text-slate-900 inline-block px-6 py-3 rounded-2xl font-bold text-lg shadow-lg">
             FREE SHIPPING ON ORDERS OVER $200.00
           </div>
 
@@ -18,7 +18,7 @@ const Hero = () => {
             Premium fishing gear for every angler. Explore our collection of rods, reels, and accessories.
           </p>
 
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105 backdrop-blur-sm">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105">
             Shop Now
           </button>
         </div>
