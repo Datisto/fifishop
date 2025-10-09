@@ -14,16 +14,26 @@ const PromotionalTiles = () => {
       title: 'NEW LINE FISHING BOATS',
       image: 'https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center bottom'
+    },
+    {
+      title: 'FISHING ACCESSORIES',
+      image: 'https://images.pexels.com/photos/416179/pexels-photo-416179.jpeg?auto=compress&cs=tinysrgb&w=800',
+      position: 'center'
+    },
+    {
+      title: 'TACKLE & GEAR',
+      image: 'https://images.pexels.com/photos/932638/pexels-photo-932638.jpeg?auto=compress&cs=tinysrgb&w=800',
+      position: 'center'
     }
   ];
 
   return (
-    <section className="container mx-auto px-4 py-16 bg-slate-900/20 backdrop-blur-lg rounded-3xl">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <section className="container mx-auto px-4 py-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {tiles.map((tile, index) => (
           <div
             key={index}
-            className="relative h-80 rounded-lg overflow-hidden shadow-xl group cursor-pointer"
+            className="relative h-60 rounded-lg overflow-hidden shadow-xl group cursor-pointer"
           >
             <div
               className="absolute inset-0 bg-cover transition-transform duration-500 group-hover:scale-110"
