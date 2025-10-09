@@ -42,7 +42,7 @@ const PromotionalTiles = () => {
                 backgroundPosition: tile.position
               }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/30 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-400/70 via-slate-900/30 to-transparent"></div>
             </div>
 
             <div className="relative h-full flex items-end p-6">
