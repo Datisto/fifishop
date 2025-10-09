@@ -53,7 +53,7 @@ const FeaturedProducts = () => {
   ];
 
   return (
-    <section className="relative bg-gradient-to-b from-slate-400/0 via-slate-400/20 to-slate-400/60 py-24">
+    <section className="relative bg-gradient-to-b from-slate-400/0 via-slate-400/20 to-slate-400/60 py-8">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-white inline-block relative drop-shadow-lg">
