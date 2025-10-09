@@ -18,7 +18,7 @@ const PromotionalTiles = () => {
   ];
 
   return (
-    <section className="container mx-auto px-4 py-16 bg-slate-900/40 backdrop-blur-sm">
+    <section className="container mx-auto px-4 py-16 bg-slate-900/20 backdrop-blur-sm">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {tiles.map((tile, index) => (
           <div
@@ -32,7 +32,7 @@ const PromotionalTiles = () => {
                 backgroundPosition: tile.position
               }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/30 to-transparent"></div>
             </div>
 
             <div className="relative h-full flex items-end p-6">
