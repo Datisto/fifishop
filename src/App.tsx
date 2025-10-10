@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import PromotionalTiles from './components/PromotionalTiles';
 import FeaturedProducts from './components/FeaturedProducts';
 
 function App() {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   return (
     <div className="min-h-screen relative">
       <div
@@ -13,11 +16,11 @@ function App() {
           zIndex: -1
         }}
       />
-      <div className="relative backdrop-blur-sm">
+      <div className="relative backdrop-blur-lg">
         <Header />
         <Hero />
-        <PromotionalTiles />
-        <FeaturedProducts />
+        <PromotionalTiles onCategorySelect={setSelectedCategory} />
+        <FeaturedProducts selectedCategory={selectedCategory} />
       </div>
     </div>
   );
