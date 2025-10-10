@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 const Hero = () => {
   const slides = [
@@ -39,24 +39,21 @@ const Hero = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
 
   return (
     <section className="relative h-[480px] overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-slate-900/30 via-slate-900/20 to-transparent rounded-b-3xl"></div>
 
       <div className="relative container mx-auto px-4 h-full flex flex-col justify-center">
-        <div className="max-w-2xl space-y-6">
+        <div className="max-w-2xl h-[320px] flex items-center">
           {slides.map((slide, index) => (
             <div
               key={index}
-              className={`absolute transition-opacity duration-500 ${
+              className={`absolute w-full transition-opacity duration-500 ${
                 index === currentSlide ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <div className="space-y-6">
+              <div className="space-y-6 max-w-2xl">
                 <div className="bg-yellow-500 text-slate-900 inline-block px-6 py-3 rounded-2xl font-bold text-lg shadow-lg">
                   {slide.badge}
                 </div>
@@ -77,13 +74,6 @@ const Hero = () => {
             </div>
           ))}
         </div>
-
-        <button
-          onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
-        >
-          <ChevronLeft size={24} />
-        </button>
 
         <button
           onClick={nextSlide}
