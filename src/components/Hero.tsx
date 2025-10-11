@@ -4,25 +4,13 @@ import { ChevronRight } from 'lucide-react';
 const Hero = () => {
   const slides = [
     {
-      badge: 'БЕЗКОШТОВНА ДОСТАВКА НА ЗАМОВЛЕННЯ ПОНАД $200.00',
-      title: 'РОЗПРОДАЖ ДО',
-      highlight: '50% ЗНИЖКИ',
-      description: 'Преміум спорядження для риболовлі для кожного рибалки. Досліджуйте нашу колекцію вудок, котушок та аксесуарів.',
-      buttonText: 'Купити зараз'
+      image: '/f1.png'
     },
     {
-      badge: 'НОВІ НАДХОДЖЕННЯ',
-      title: 'ВІДКРИЙТЕ',
-      highlight: 'НОВІТНЄ СПОРЯДЖЕННЯ',
-      description: 'Отримайте найновіше риболовне обладнання та аксесуари від провідних брендів.',
-      buttonText: 'Переглянути зараз'
+      image: '/f2.png'
     },
     {
-      badge: 'ЕКСКЛЮЗИВНІ ПРОПОЗИЦІЇ',
-      title: 'ЕКОНОМТЕ НА',
-      highlight: 'ПРОФЕСІЙНОМУ СПОРЯДЖЕННІ',
-      description: 'Професійні риболовні інструменти за неперевершеними цінами. Обмежена пропозиція!',
-      buttonText: 'Переглянути пропозиції'
+      image: '/f3.png'
     }
   ];
 
@@ -39,62 +27,44 @@ const Hero = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
-
   return (
     <section className="relative h-[480px] overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-900/30 via-slate-900/20 to-transparent rounded-b-3xl"></div>
-
-      <div className="relative container mx-auto px-4 h-full flex flex-col justify-center">
-        <div className="max-w-2xl h-[320px] flex items-center">
-          {slides.map((slide, index) => (
-            <div
-              key={index}
-              className={`absolute w-full transition-opacity duration-500 ${
-                index === currentSlide ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <div className="space-y-6 max-w-2xl">
-                <div className="bg-yellow-500 text-slate-900 inline-block px-6 py-3 rounded-2xl font-bold text-lg shadow-lg">
-                  {slide.badge}
-                </div>
-
-                <h2 className="text-6xl font-bold text-white drop-shadow-2xl leading-tight">
-                  {slide.title}<br />
-                  <span className="text-yellow-400">{slide.highlight}</span>
-                </h2>
-
-                <p className="text-xl text-white drop-shadow-lg max-w-lg">
-                  {slide.description}
-                </p>
-
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105">
-                  {slide.buttonText}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <button
-          onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
-        >
-          <ChevronRight size={24} />
-        </button>
-
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                index === currentSlide
-                  ? 'bg-yellow-400 w-8'
-                  : 'bg-white/50 hover:bg-white/70'
-              }`}
+      <div className="relative w-full h-full">
+        {slides.map((slide, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-500 ${
+              index === currentSlide ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <img
+              src={slide.image}
+              alt={`Банер ${index + 1}`}
+              className="w-full h-full object-cover"
             />
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={nextSlide}
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm z-10"
+      >
+        <ChevronRight size={24} />
+      </button>
+
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={`w-3 h-3 rounded-full transition-all duration-200 ${
+              index === currentSlide
+                ? 'bg-yellow-400 w-8'
+                : 'bg-white/50 hover:bg-white/70'
+            }`}
+          />
+        ))}
       </div>
     </section>
   );
