@@ -36,14 +36,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {product.description}
         </p>
 
-        <div className="flex items-center justify-between mt-auto">
-          <span className="text-base font-bold text-slate-900 whitespace-nowrap">
+        <div className="mt-auto">
+          <span className="text-lg font-bold text-slate-900 block">
             {product.price.toLocaleString('uk-UA')} ₴
           </span>
-
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-2 py-1 text-xs rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap">
-            ДИВИТИСЬ
-          </button>
         </div>
       </div>
     </div>
