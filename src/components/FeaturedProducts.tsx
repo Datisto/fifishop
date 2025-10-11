@@ -130,24 +130,24 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
   const finalProducts = selectedCategory === 'TOP SELLERS' ? topProducts : displayProducts;
 
   return (
-    <section className="relative bg-gradient-to-b from-slate-400/0 via-slate-400/20 to-slate-400/60 py-8">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold text-white inline-block relative drop-shadow-lg">
+    <section className="relative bg-gradient-to-b from-slate-400/0 via-slate-400/20 to-slate-400/60 py-6 sm:py-8">
+      <div className="container mx-auto px-3 sm:px-4">
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white inline-block relative drop-shadow-lg px-2">
             {selectedCategory || 'РЕКОМЕНДОВАНІ ТОВАРИ'}
-            <div className="absolute -bottom-3 left-0 right-0 h-1.5 bg-yellow-400 rounded-full shadow-lg"></div>
+            <div className="absolute -bottom-2 sm:-bottom-3 left-0 right-0 h-1 sm:h-1.5 bg-yellow-400 rounded-full shadow-lg"></div>
           </h2>
         </div>
 
         {finalProducts.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3">
             {finalProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-2xl text-white drop-shadow-lg">
+          <div className="text-center py-8 sm:py-12">
+            <p className="text-lg sm:text-xl md:text-2xl text-white drop-shadow-lg px-4">
               Товари в цій категорії не знайдено
             </p>
           </div>
