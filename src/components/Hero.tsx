@@ -65,9 +65,9 @@ const Hero = () => {
         <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent pointer-events-none"></div>
       </div>
 
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-900/30 via-slate-900/20 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/40 to-transparent z-10"></div>
 
-      <div className="relative container mx-auto px-3 sm:px-4 h-full flex items-center">
+      <div className="absolute inset-0 z-20 container mx-auto px-3 sm:px-4 flex items-center">
         <div className="max-w-2xl">
           {slides.map((slide, index) => (
             <div
@@ -101,13 +101,13 @@ const Hero = () => {
 
       <button
         onClick={nextSlide}
-        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 sm:p-3 rounded-full transition-all duration-200 backdrop-blur-sm z-10"
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 sm:p-3 rounded-full transition-all duration-200 backdrop-blur-sm z-30"
       >
         <ChevronRight size={20} className="sm:hidden" />
         <ChevronRight size={24} className="hidden sm:block" />
       </button>
 
-      <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2 z-10">
+      <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2 z-30">
         {slides.map((_, index) => (
           <button
             key={index}
