@@ -4,25 +4,25 @@ import { ChevronRight } from 'lucide-react';
 const Hero = () => {
   const slides = [
     {
-      badge: 'FREE SHIPPING ON ORDERS OVER $200.00',
-      title: 'SALE UP TO',
-      highlight: '50% OFF',
-      description: 'Premium fishing gear for every angler. Explore our collection of rods, reels, and accessories.',
-      buttonText: 'Shop Now'
+      badge: 'БЕЗКОШТОВНА ДОСТАВКА НА ЗАМОВЛЕННЯ ПОНАД $200.00',
+      title: 'РОЗПРОДАЖ ДО',
+      highlight: '50% ЗНИЖКИ',
+      description: 'Преміум спорядження для риболовлі для кожного рибалки. Досліджуйте нашу колекцію вудок, котушок та аксесуарів.',
+      buttonText: 'Купити зараз'
     },
     {
-      badge: 'NEW ARRIVALS',
-      title: 'DISCOVER THE',
-      highlight: 'LATEST GEAR',
-      description: 'Get your hands on the newest fishing equipment and accessories from top brands.',
-      buttonText: 'Explore Now'
+      badge: 'НОВІ НАДХОДЖЕННЯ',
+      title: 'ВІДКРИЙТЕ',
+      highlight: 'НОВІТНЄ СПОРЯДЖЕННЯ',
+      description: 'Отримайте найновіше риболовне обладнання та аксесуари від провідних брендів.',
+      buttonText: 'Переглянути зараз'
     },
     {
-      badge: 'EXCLUSIVE DEALS',
-      title: 'SAVE BIG ON',
-      highlight: 'PRO EQUIPMENT',
-      description: 'Professional-grade fishing tools at unbeatable prices. Limited time offers!',
-      buttonText: 'View Deals'
+      badge: 'ЕКСКЛЮЗИВНІ ПРОПОЗИЦІЇ',
+      title: 'ЕКОНОМТЕ НА',
+      highlight: 'ПРОФЕСІЙНОМУ СПОРЯДЖЕННІ',
+      description: 'Професійні риболовні інструменти за неперевершеними цінами. Обмежена пропозиція!',
+      buttonText: 'Переглянути пропозиції'
     }
   ];
 

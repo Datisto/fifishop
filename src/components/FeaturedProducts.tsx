@@ -8,8 +8,8 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
   const allProducts = [
     {
       id: 1,
-      name: 'Professional Fishing Rod',
-      description: 'High-performance carbon fiber rod with exceptional sensitivity',
+      name: 'Професійна Риболовна Вудка',
+      description: 'Високопродуктивна вудка з вуглецевого волокна з виключною чутливістю',
       price: 149.99,
       image: 'https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
@@ -17,8 +17,8 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     },
     {
       id: 2,
-      name: 'Premium Spinning Reel',
-      description: 'Smooth operation with advanced drag system',
+      name: 'Преміум Спінінгова Котушка',
+      description: 'Плавна робота з вдосконаленою системою гальмування',
       price: 89.99,
       image: 'https://images.pexels.com/photos/2398220/pexels-photo-2398220.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: true,
@@ -26,8 +26,8 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     },
     {
       id: 3,
-      name: 'Tackle Box Deluxe',
-      description: 'Organized storage for all your fishing essentials',
+      name: 'Коробка для Приманок Делюкс',
+      description: 'Організоване зберігання для всіх риболовних потреб',
       price: 45.99,
       image: 'https://images.pexels.com/photos/7657988/pexels-photo-7657988.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
@@ -35,8 +35,8 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     },
     {
       id: 4,
-      name: 'Braided Fishing Line',
-      description: 'Ultra-strong 30lb test line for big catches',
+      name: 'Плетена Волосінь',
+      description: 'Ультраміцна волосінь 30 фунтів для великого улову',
       price: 24.99,
       image: 'https://images.pexels.com/photos/932638/pexels-photo-932638.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: true,
@@ -44,8 +44,8 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     },
     {
       id: 5,
-      name: 'Lure Collection Set',
-      description: 'Assorted lures for freshwater and saltwater fishing',
+      name: 'Набір Приманок',
+      description: 'Асортимент приманок для прісноводної та морської риболовлі',
       price: 34.99,
       image: 'https://images.pexels.com/photos/416179/pexels-photo-416179.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
@@ -53,8 +53,8 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     },
     {
       id: 6,
-      name: 'Fishing Vest Pro',
-      description: 'Comfortable vest with multiple pockets and ventilation',
+      name: 'Риболовний Жилет Про',
+      description: 'Зручний жилет з багатьма кишенями та вентиляцією',
       price: 79.99,
       image: 'https://images.pexels.com/photos/235725/pexels-photo-235725.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: true,
@@ -62,8 +62,8 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     },
     {
       id: 7,
-      name: 'Carbon Fiber Rod',
-      description: 'Lightweight and durable for long casting sessions',
+      name: 'Вудка з Вуглецевого Волокна',
+      description: 'Легка та міцна для тривалих сесій закидання',
       price: 129.99,
       image: 'https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
@@ -71,8 +71,8 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     },
     {
       id: 8,
-      name: 'Fishing Boat Accessories',
-      description: 'Complete set for your fishing boat',
+      name: 'Аксесуари для Риболовного Човна',
+      description: 'Повний набір для вашого риболовного човна',
       price: 299.99,
       image: 'https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: true,
@@ -80,8 +80,8 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     },
     {
       id: 9,
-      name: 'Fishing Hook Set',
-      description: 'Various sizes for different fishing needs',
+      name: 'Набір Гачків',
+      description: 'Різні розміри для різних потреб риболовлі',
       price: 19.99,
       image: 'https://images.pexels.com/photos/416179/pexels-photo-416179.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
@@ -89,8 +89,8 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     },
     {
       id: 10,
-      name: 'Tackle Bag',
-      description: 'Heavy-duty bag with multiple compartments',
+      name: 'Сумка для Спорядження',
+      description: 'Міцна сумка з багатьма відділеннями',
       price: 54.99,
       image: 'https://images.pexels.com/photos/932638/pexels-photo-932638.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
@@ -98,8 +98,8 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     },
     {
       id: 11,
-      name: 'Fishing Net Pro',
-      description: 'Durable net for landing big catches',
+      name: 'Риболовна Сітка Про',
+      description: 'Міцна сітка для вилову великого улову',
       price: 39.99,
       image: 'https://images.pexels.com/photos/3689772/pexels-photo-3689772.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: true,
@@ -107,8 +107,8 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     },
     {
       id: 12,
-      name: 'Waders Deluxe',
-      description: 'Waterproof waders for all-day comfort',
+      name: 'Вейдерси Делюкс',
+      description: 'Водонепроникні вейдерси для комфорту на весь день',
       price: 159.99,
       image: 'https://images.pexels.com/photos/235725/pexels-photo-235725.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
@@ -134,7 +134,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-white inline-block relative drop-shadow-lg">
-            {selectedCategory || 'FEATURED PRODUCTS'}
+            {selectedCategory || 'РЕКОМЕНДОВАНІ ТОВАРИ'}
             <div className="absolute -bottom-3 left-0 right-0 h-1.5 bg-yellow-400 rounded-full shadow-lg"></div>
           </h2>
         </div>
@@ -148,7 +148,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
         ) : (
           <div className="text-center py-12">
             <p className="text-2xl text-white drop-shadow-lg">
-              No products found in this category
+              Товари в цій категорії не знайдено
             </p>
           </div>
         )}

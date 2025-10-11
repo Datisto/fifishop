@@ -10,62 +10,62 @@ const PromotionalTiles = ({ onCategorySelect }: PromotionalTilesProps) => {
 
   const tiles = [
     {
-      title: 'TOP SELLERS',
+      title: 'ТОПОВІ ПРОДАЖІ',
       image: 'https://images.pexels.com/photos/3689772/pexels-photo-3689772.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center'
     },
     {
-      title: 'FLY-FISHING RODS',
+      title: 'ВУДКИ ДЛЯ НАХЛИСТУ',
       image: 'https://images.pexels.com/photos/2398220/pexels-photo-2398220.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center'
     },
     {
-      title: 'FISHING BOATS',
+      title: 'РИБОЛОВНІ ЧОВНИ',
       image: 'https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center bottom'
     },
     {
-      title: 'ACCESSORIES',
+      title: 'АКСЕСУАРИ',
       image: 'https://images.pexels.com/photos/416179/pexels-photo-416179.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center'
     },
     {
-      title: 'TACKLE & GEAR',
+      title: 'СНАСТІ ТА СПОРЯДЖЕННЯ',
       image: 'https://images.pexels.com/photos/932638/pexels-photo-932638.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center'
     },
     {
-      title: 'SPINNING REELS',
+      title: 'СПІНІНГОВІ КОТУШКИ',
       image: 'https://images.pexels.com/photos/2398220/pexels-photo-2398220.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center'
     },
     {
-      title: 'FISHING LINES',
+      title: 'РИБОЛОВНІ ВОЛОСІНІ',
       image: 'https://images.pexels.com/photos/932638/pexels-photo-932638.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center'
     },
     {
-      title: 'LURES & BAITS',
+      title: 'ПРИМАНКИ ТА НАЖИВКА',
       image: 'https://images.pexels.com/photos/416179/pexels-photo-416179.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center'
     },
     {
-      title: 'FISHING VESTS',
+      title: 'РИБОЛОВНІ ЖИЛЕТИ',
       image: 'https://images.pexels.com/photos/235725/pexels-photo-235725.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center'
     },
     {
-      title: 'TACKLE BOXES',
+      title: 'КОРОБКИ ДЛЯ ПРИМАНОК',
       image: 'https://images.pexels.com/photos/7657988/pexels-photo-7657988.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center'
     },
     {
-      title: 'FISHING NETS',
+      title: 'РИБОЛОВНІ СІТКИ',
       image: 'https://images.pexels.com/photos/3689772/pexels-photo-3689772.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center'
     },
     {
-      title: 'WADERS',
+      title: 'ВЕЙДЕРСИ',
       image: 'https://images.pexels.com/photos/235725/pexels-photo-235725.jpeg?auto=compress&cs=tinysrgb&w=800',
       position: 'center'
     }
@@ -109,11 +109,11 @@ const PromotionalTiles = ({ onCategorySelect }: PromotionalTilesProps) => {
           >
             {isExpanded ? (
               <>
-                Show Less <ChevronUp size={20} />
+                Показати менше <ChevronUp size={20} />
               </>
             ) : (
               <>
-                Show More ({tiles.length - 5} more) <ChevronDown size={20} />
+                Показати більше (ще {tiles.length - 5}) <ChevronDown size={20} />
               </>
             )}
           </button>

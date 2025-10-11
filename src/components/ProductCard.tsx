@@ -22,7 +22,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         />
         {product.onSale && (
           <div className="absolute top-2 right-2 bg-red-600 text-white font-bold px-2 py-1 text-xs rounded-lg shadow-lg backdrop-blur-sm">
-            SALE
+            РОЗПРОДАЖ
           </div>
         )}
       </div>
@@ -42,7 +42,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </span>
 
           <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1 text-xs rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">
-            VIEW
+            ПЕРЕГЛЯНУТИ
           </button>
         </div>
       </div>

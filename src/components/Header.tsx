@@ -1,7 +1,7 @@
 import { Search, Fish } from 'lucide-react';
 
 const Header = () => {
-  const navItems = ['Accessories', 'Baits', 'Rods & Reels', 'Boats', 'Apparel', 'Swim Baits'];
+  const navItems = ['Аксесуари', 'Приманки', 'Вудки та Котушки', 'Човни', 'Одяг', 'Воблери'];
 
   return (
     <header className="bg-slate-900/70 backdrop-blur-md text-white shadow-lg">
@@ -9,13 +9,13 @@ const Header = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <Fish className="w-10 h-10" strokeWidth={1.5} />
-            <h1 className="text-2xl font-bold tracking-wide">Fishing Store</h1>
+            <h1 className="text-2xl font-bold tracking-wide">Магазин Риболовлі</h1>
           </div>
 
           <div className="relative w-80">
             <input
               type="text"
-              placeholder="Search…"
+              placeholder="Пошук…"
               className="w-full px-4 py-2 pl-10 bg-slate-700/50 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-slate-400"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
