@@ -44,6 +44,8 @@ const Hero = () => {
             />
           </div>
         ))}
+        <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-slate-900 to-transparent pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
       </div>
 
       <button
