@@ -47,39 +47,6 @@ const Hero = () => {
 
   return (
     <section className="relative h-[280px] sm:h-[360px] md:h-[420px] lg:h-[480px] overflow-hidden">
-      
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-900/30 via-slate-900/20 to-transparent rounded-b-3xl"></div>
-
-      <div className="relative container mx-auto px-4 h-full flex flex-col justify-center">
-        <div className="max-w-2xl h-[320px] flex items-center">
-          {slides.map((slide, index) => (
-            <div
-              key={index}
-              className={`absolute w-full transition-opacity duration-500 ${
-                index === currentSlide ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <div className="space-y-6 max-w-2xl">
-                <div className="bg-yellow-500 text-slate-900 inline-block px-6 py-3 rounded-2xl font-bold text-lg shadow-lg">
-                  {slide.badge}
-                </div>
-
-                <h2 className="text-6xl font-bold text-white drop-shadow-2xl leading-tight">
-                  {slide.title}<br />
-                  <span className="text-yellow-400">{slide.highlight}</span>
-                </h2>
-
-                <p className="text-xl text-white drop-shadow-lg max-w-lg">
-                  {slide.description}
-                </p>
-
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105">
-                  {slide.buttonText}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
       <div className="relative w-full h-full">
         {slides.map((slide, index) => (
           <div
