@@ -27,22 +27,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
         )}
       </div>
 
-      <div className="p-3">
-        <h3 className="text-sm font-bold text-slate-900 mb-1">
+      <div className="p-3 flex flex-col h-[calc(100%-8rem)]">
+        <h3 className="text-sm font-bold text-slate-900 mb-1 line-clamp-2 min-h-[2.5rem]">
           {product.name}
         </h3>
 
-        <p className="text-slate-600 text-xs mb-2 line-clamp-1">
+        <p className="text-slate-600 text-xs mb-2 line-clamp-2 flex-grow">
           {product.description}
         </p>
 
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-bold text-slate-900">
-            ${product.price.toFixed(2)}
+        <div className="flex items-center justify-between mt-auto">
+          <span className="text-base font-bold text-slate-900 whitespace-nowrap">
+            {product.price.toLocaleString('uk-UA')} ₴
           </span>
 
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1 text-xs rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">
-            ПЕРЕГЛЯНУТИ
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-2 py-1 text-xs rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap">
+            ДИВИТИСЬ
           </button>
         </div>
       </div>

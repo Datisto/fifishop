@@ -10,7 +10,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       id: 1,
       name: 'Професійна Риболовна Вудка',
       description: 'Високопродуктивна вудка з вуглецевого волокна з виключною чутливістю',
-      price: 149.99,
+      price: 5999,
       image: 'https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
       category: 'FLY-FISHING RODS'
@@ -19,7 +19,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       id: 2,
       name: 'Преміум Спінінгова Котушка',
       description: 'Плавна робота з вдосконаленою системою гальмування',
-      price: 89.99,
+      price: 3599,
       image: 'https://images.pexels.com/photos/2398220/pexels-photo-2398220.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: true,
       category: 'SPINNING REELS'
@@ -28,7 +28,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       id: 3,
       name: 'Коробка для Приманок Делюкс',
       description: 'Організоване зберігання для всіх риболовних потреб',
-      price: 45.99,
+      price: 1849,
       image: 'https://images.pexels.com/photos/7657988/pexels-photo-7657988.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
       category: 'TACKLE BOXES'
@@ -37,7 +37,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       id: 4,
       name: 'Плетена Волосінь',
       description: 'Ультраміцна волосінь 30 фунтів для великого улову',
-      price: 24.99,
+      price: 999,
       image: 'https://images.pexels.com/photos/932638/pexels-photo-932638.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: true,
       category: 'FISHING LINES'
@@ -46,7 +46,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       id: 5,
       name: 'Набір Приманок',
       description: 'Асортимент приманок для прісноводної та морської риболовлі',
-      price: 34.99,
+      price: 1399,
       image: 'https://images.pexels.com/photos/416179/pexels-photo-416179.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
       category: 'LURES & BAITS'
@@ -55,7 +55,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       id: 6,
       name: 'Риболовний Жилет Про',
       description: 'Зручний жилет з багатьма кишенями та вентиляцією',
-      price: 79.99,
+      price: 3199,
       image: 'https://images.pexels.com/photos/235725/pexels-photo-235725.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: true,
       category: 'FISHING VESTS'
@@ -64,7 +64,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       id: 7,
       name: 'Вудка з Вуглецевого Волокна',
       description: 'Легка та міцна для тривалих сесій закидання',
-      price: 129.99,
+      price: 5199,
       image: 'https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
       category: 'FLY-FISHING RODS'
@@ -73,7 +73,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       id: 8,
       name: 'Аксесуари для Риболовного Човна',
       description: 'Повний набір для вашого риболовного човна',
-      price: 299.99,
+      price: 11999,
       image: 'https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: true,
       category: 'FISHING BOATS'
@@ -82,7 +82,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       id: 9,
       name: 'Набір Гачків',
       description: 'Різні розміри для різних потреб риболовлі',
-      price: 19.99,
+      price: 799,
       image: 'https://images.pexels.com/photos/416179/pexels-photo-416179.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
       category: 'ACCESSORIES'
@@ -91,7 +91,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       id: 10,
       name: 'Сумка для Спорядження',
       description: 'Міцна сумка з багатьма відділеннями',
-      price: 54.99,
+      price: 2199,
       image: 'https://images.pexels.com/photos/932638/pexels-photo-932638.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
       category: 'TACKLE & GEAR'
@@ -100,7 +100,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       id: 11,
       name: 'Риболовна Сітка Про',
       description: 'Міцна сітка для вилову великого улову',
-      price: 39.99,
+      price: 1599,
       image: 'https://images.pexels.com/photos/3689772/pexels-photo-3689772.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: true,
       category: 'FISHING NETS'
@@ -109,7 +109,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       id: 12,
       name: 'Вейдерси Делюкс',
       description: 'Водонепроникні вейдерси для комфорту на весь день',
-      price: 159.99,
+      price: 6399,
       image: 'https://images.pexels.com/photos/235725/pexels-photo-235725.jpeg?auto=compress&cs=tinysrgb&w=400',
       onSale: false,
       category: 'WADERS'
