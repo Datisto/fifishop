@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 interface Product {
   id: number;
   name: string;
@@ -12,8 +14,12 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const navigate = useNavigate();
+
   return (
-    <div className="bg-white/95 rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+    <div
+      onClick={() => navigate(`/product/${product.id}`)}
+      className="bg-white/95 rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer">
       <div className="relative h-28 sm:h-32 overflow-hidden bg-slate-200">
         <img
           src={product.image}
