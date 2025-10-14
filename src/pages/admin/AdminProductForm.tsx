@@ -45,8 +45,16 @@ export default function AdminProductForm() {
     fetchCategories();
     if (isEdit) {
       fetchProduct();
+    } else {
+      generateSku();
     }
   }, [id]);
+
+  const generateSku = () => {
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    setFormData(prev => ({ ...prev, sku: `${timestamp}${random}` }));
+  };
 
   const fetchCategories = async () => {
     try {
@@ -274,7 +282,9 @@ export default function AdminProductForm() {
                   value={formData.sku}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  readOnly={!isEdit}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-slate-50"
+                  placeholder="Генерується автоматично"
                 />
               </div>
 
