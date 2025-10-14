@@ -38,7 +38,10 @@ export async function logAdminAction(
 ) {
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) return;
+  if (!user) {
+    console.log('Admin action:', action, entityType, entityId, details);
+    return;
+  }
 
   await supabase.from('admin_logs').insert({
     user_id: user.id,
