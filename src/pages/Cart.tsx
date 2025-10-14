@@ -87,9 +87,18 @@ export default function Cart() {
 
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="text-lg font-bold text-slate-900 mb-1">{item.name}</h3>
-                          <p className="text-sm text-slate-600">Артикул: {item.sku}</p>
+                        <div className="flex-1">
+                          <h3
+                            className="text-lg font-bold text-slate-900 mb-1 cursor-pointer hover:text-yellow-600 transition-colors"
+                            onClick={() => navigate(`/product/${item.id}`)}
+                          >
+                            {item.name}
+                          </h3>
+                          {item.description && (
+                            <p className="text-sm text-slate-600 mb-2 line-clamp-1">
+                              {item.description}
+                            </p>
+                          )}
                         </div>
                         <button
                           onClick={() => removeItem(item.id)}
@@ -129,11 +138,15 @@ export default function Cart() {
                               <p className="text-sm text-slate-500 line-through">
                                 {(item.price * item.quantity).toFixed(2)} ₴
                               </p>
+                              <p className="text-xs text-slate-400 mt-1">Арт: {item.sku}</p>
                             </div>
                           ) : (
-                            <p className="text-2xl font-bold text-slate-900">
-                              {(item.price * item.quantity).toFixed(2)} ₴
-                            </p>
+                            <div>
+                              <p className="text-2xl font-bold text-slate-900">
+                                {(item.price * item.quantity).toFixed(2)} ₴
+                              </p>
+                              <p className="text-xs text-slate-400 mt-1">Арт: {item.sku}</p>
+                            </div>
                           )}
                         </div>
                       </div>

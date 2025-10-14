@@ -9,6 +9,7 @@ export interface CartItem {
   image_url?: string;
   sku: string;
   stock_quantity: number;
+  description?: string;
 }
 
 interface UndoAction {

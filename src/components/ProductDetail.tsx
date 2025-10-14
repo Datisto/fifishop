@@ -58,7 +58,8 @@ const ProductDetail = () => {
         quantity: 1,
         image_url: imageUrl,
         sku: product.sku,
-        stock_quantity: product.stock_quantity
+        stock_quantity: product.stock_quantity,
+        description: product.description
       });
 
       navigate('/cart');
