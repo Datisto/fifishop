@@ -6,7 +6,7 @@ export interface Banner {
   image_url: string;
   mobile_image_url: string | null;
   link_url: string | null;
-  position: 'hero' | 'sidebar' | 'footer' | 'popup';
+  placement: 'home' | 'category' | 'promo';
   category_id: string | null;
   is_active: boolean;
   sort_order: number;
@@ -16,15 +16,15 @@ export interface Banner {
   updated_at: string;
 }
 
-export async function getBanners(position?: string, isActive?: boolean) {
+export async function getBanners(placement?: string, isActive?: boolean) {
   let query = supabase
     .from('banners')
     .select('*')
     .order('sort_order', { ascending: true })
     .order('created_at', { ascending: false });
 
-  if (position) {
-    query = query.eq('position', position);
+  if (placement) {
+    query = query.eq('placement', placement);
   }
 
   if (isActive !== undefined) {

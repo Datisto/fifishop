@@ -25,7 +25,7 @@ export default function AdminBannerForm() {
     image_url: '',
     mobile_image_url: '',
     link_url: '',
-    position: 'hero',
+    placement: 'home',
     category_id: '',
     is_active: true,
     sort_order: 0,
@@ -59,7 +59,7 @@ export default function AdminBannerForm() {
           image_url: banner.image_url,
           mobile_image_url: banner.mobile_image_url || '',
           link_url: banner.link_url || '',
-          position: banner.position,
+          placement: banner.placement,
           category_id: banner.category_id || '',
           is_active: banner.is_active,
           sort_order: banner.sort_order,
@@ -205,19 +205,18 @@ export default function AdminBannerForm() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Позиція *
+                  Розміщення *
                 </label>
                 <select
-                  name="position"
-                  value={formData.position}
+                  name="placement"
+                  value={formData.placement}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="hero">Головний слайдер</option>
-                  <option value="sidebar">Бічна панель</option>
-                  <option value="footer">Підвал</option>
-                  <option value="popup">Спливаюче вікно</option>
+                  <option value="home">Головна сторінка</option>
+                  <option value="category">Сторінка категорії</option>
+                  <option value="promo">Промо-сторінка</option>
                 </select>
               </div>
 
