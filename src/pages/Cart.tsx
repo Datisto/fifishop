@@ -12,9 +12,9 @@ export default function Cart() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-transparent py-12">
+        <div className="min-h-screen bg-slate-50 py-12">
           <div className="container mx-auto px-4">
-            <div className="max-w-2xl mx-auto text-center bg-white/95 rounded-2xl p-12 shadow-2xl">
+            <div className="max-w-2xl mx-auto text-center bg-white rounded-2xl p-12 shadow-2xl">
               <ShoppingBag className="w-24 h-24 mx-auto text-slate-300 mb-6" />
               <h1 className="text-3xl font-bold text-slate-900 mb-4">Кошик порожній</h1>
               <p className="text-slate-600 mb-8">
@@ -36,12 +36,12 @@ export default function Cart() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-transparent py-8">
+      <div className="min-h-screen bg-slate-50 py-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-white mb-8 drop-shadow-lg">Кошик</h1>
+          <h1 className="text-3xl font-bold text-slate-900 mb-8">Кошик</h1>
 
           {undoAction && (
-            <div className="max-w-4xl mb-6 p-4 bg-white/95 border border-slate-200 rounded-lg shadow-lg">
+            <div className="max-w-4xl mb-6 p-4 bg-white border border-slate-200 rounded-lg shadow-lg">
               <div className="flex items-center justify-between">
                 <p className="text-slate-700">
                   {undoAction.type === 'remove' ? 'Товар видалено з кошика' : 'Кількість змінено'}
@@ -70,7 +70,7 @@ export default function Cart() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white/95 rounded-xl border border-slate-200 p-6 hover:shadow-xl transition-shadow shadow-lg"
+                  className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-xl transition-shadow shadow-lg"
                 >
                   <div className="flex gap-6">
                     {item.image_url ? (
@@ -150,7 +150,7 @@ export default function Cart() {
             </div>
 
             <div className="lg:col-span-1">
-              <div className="bg-white/95 rounded-xl border border-slate-200 p-6 sticky top-4 shadow-lg">
+              <div className="bg-white rounded-xl border border-slate-200 p-6 sticky top-4 shadow-lg">
                 <h2 className="text-xl font-bold text-slate-900 mb-4">Підсумок замовлення</h2>
 
                 <div className="space-y-3 mb-6">

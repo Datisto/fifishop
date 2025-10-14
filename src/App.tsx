@@ -31,6 +31,9 @@ function App() {
         <Route path="/admin/banners/edit/:id" element={<AdminBannerForm />} />
         <Route path="/admin/promo-codes" element={<AdminDashboard />} />
 
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+
         <Route
           path="/*"
           element={
@@ -46,8 +49,6 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/product/:id" element={<ProductDetail />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/checkout" element={<Checkout />} />
                 </Routes>
               </div>
             </div>
