@@ -1,10 +1,12 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase, logLoginAttempt, checkLoginAttempts, isUserAdmin } from '../../lib/supabase';
-import { Lock, Mail, AlertCircle } from 'lucide-react';
+import { Lock, User, AlertCircle } from 'lucide-react';
+
+const ADMIN_USERNAME = 'ADMIN';
+const ADMIN_PASSWORD = 'ADMIN';
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,47 +17,15 @@ export default function AdminLogin() {
     setError('');
     setLoading(true);
 
-    try {
-      const failedAttempts = await checkLoginAttempts(email);
-
-      if (failedAttempts >= 5) {
-        setError('Забагато невдалих спроб входу. Спробуйте через годину.');
-        setLoading(false);
-        return;
-      }
-
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInError) {
-        await logLoginAttempt(email, false);
-        setError('Невірний email або пароль');
-        setLoading(false);
-        return;
-      }
-
-      if (data.user) {
-        const isAdmin = await isUserAdmin();
-
-        if (!isAdmin) {
-          await supabase.auth.signOut();
-          await logLoginAttempt(email, false);
-          setError('У вас немає прав адміністратора');
-          setLoading(false);
-          return;
-        }
-
-        await logLoginAttempt(email, true);
+    setTimeout(() => {
+      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        localStorage.setItem('adminLoggedIn', 'true');
         navigate('/admin/dashboard');
+      } else {
+        setError('Невірний логін або пароль');
       }
-    } catch (err) {
-      setError('Виникла помилка при вході');
-      console.error(err);
-    } finally {
       setLoading(false);
-    }
+    }, 500);
   };
 
   return (
@@ -81,19 +51,19 @@ export default function AdminLogin() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
-                Email
+              <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-2">
+                Логін
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                   className="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="admin@example.com"
+                  placeholder="ADMIN"
                 />
               </div>
             </div>
@@ -111,7 +81,7 @@ export default function AdminLogin() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="••••••••"
+                  placeholder="ADMIN"
                 />
               </div>
             </div>
@@ -127,7 +97,7 @@ export default function AdminLogin() {
 
           <div className="mt-6 pt-6 border-t border-slate-200">
             <p className="text-center text-sm text-slate-600">
-              Після 5 невдалих спроб вхід буде заблоковано на 1 годину
+              Логін: ADMIN, Пароль: ADMIN
             </p>
           </div>
         </div>

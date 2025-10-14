@@ -1,6 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { supabase, isUserAdmin } from '../../lib/supabase';
 import {
   LayoutDashboard,
   Package,
@@ -26,18 +25,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     checkAuth();
   }, []);
 
-  const checkAuth = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+  const checkAuth = () => {
+    const isLoggedIn = localStorage.getItem('adminLoggedIn');
 
-    if (!user) {
-      navigate('/admin/login');
-      return;
-    }
-
-    const isAdmin = await isUserAdmin();
-
-    if (!isAdmin) {
-      await supabase.auth.signOut();
+    if (!isLoggedIn) {
       navigate('/admin/login');
       return;
     }
@@ -45,8 +36,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     setLoading(false);
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = () => {
+    localStorage.removeItem('adminLoggedIn');
     navigate('/admin/login');
   };
 
