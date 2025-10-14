@@ -7,6 +7,8 @@ import AdminProducts from './pages/admin/AdminProducts';
 import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminCategoryForm from './pages/admin/AdminCategoryForm';
+import AdminBanners from './pages/admin/AdminBanners';
+import AdminBannerForm from './pages/admin/AdminBannerForm';
 
 function App() {
   return (
@@ -20,7 +22,9 @@ function App() {
         <Route path="/admin/categories" element={<AdminCategories />} />
         <Route path="/admin/categories/new" element={<AdminCategoryForm />} />
         <Route path="/admin/categories/edit/:id" element={<AdminCategoryForm />} />
-        <Route path="/admin/banners" element={<AdminDashboard />} />
+        <Route path="/admin/banners" element={<AdminBanners />} />
+        <Route path="/admin/banners/new" element={<AdminBannerForm />} />
+        <Route path="/admin/banners/edit/:id" element={<AdminBannerForm />} />
         <Route path="/admin/promo-codes" element={<AdminDashboard />} />
 
         <Route
