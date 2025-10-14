@@ -2,11 +2,9 @@ import { Search, Fish, Menu, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
-import CartPopup from './CartPopup';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const { getTotalItems } = useCart();
   const navigate = useNavigate();
   const navItems = ['Аксесуари', 'Приманки', 'Вудки та Котушки', 'Човни', 'Одяг', 'Воблери'];
@@ -14,27 +12,26 @@ const Header = () => {
   const totalItems = getTotalItems();
 
   return (
-    <>
-      <header className="bg-slate-900/70 backdrop-blur-md text-white shadow-lg relative z-50">
-        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
-          <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onClick={() => navigate('/')}>
-              <Fish className="w-7 h-7 sm:w-10 sm:h-10" strokeWidth={1.5} />
-              <h1 className="text-lg sm:text-2xl font-bold tracking-wide">Магазин Риболовлі</h1>
-            </div>
+    <header className="bg-slate-900/70 backdrop-blur-md text-white shadow-lg relative z-50">
+      <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onClick={() => navigate('/')}>
+            <Fish className="w-7 h-7 sm:w-10 sm:h-10" strokeWidth={1.5} />
+            <h1 className="text-lg sm:text-2xl font-bold tracking-wide">Магазин Риболовлі</h1>
+          </div>
 
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setIsCartOpen(!isCartOpen)}
-                className="relative p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
-              >
-                <ShoppingCart className="w-6 h-6" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {totalItems}
-                  </span>
-                )}
-              </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/cart')}
+              className="relative p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </button>
 
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -96,9 +93,6 @@ const Header = () => {
         </nav>
       </div>
     </header>
-
-    <CartPopup isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-  </>
   );
 };
 
