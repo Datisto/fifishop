@@ -15,8 +15,8 @@ import AdminBannerForm from './pages/admin/AdminBannerForm';
 
 function App() {
   return (
-    <CartProvider>
-      <Router>
+    <Router>
+      <CartProvider>
         <Routes>
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
@@ -54,8 +54,8 @@ function App() {
           }
         />
       </Routes>
+      </CartProvider>
     </Router>
-  </CartProvider>
   );
 }
 
