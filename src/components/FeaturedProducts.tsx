@@ -13,6 +13,12 @@ interface Product {
   price: number;
   discount_price?: number;
   main_image_url?: string;
+  sku: string;
+  stock_quantity: number;
+  product_images?: Array<{
+    image_url: string;
+    sort_order: number;
+  }>;
   product_categories?: Array<{
     categories: {
       name: string;
@@ -39,6 +45,12 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
           price,
           discount_price,
           main_image_url,
+          sku,
+          stock_quantity,
+          product_images (
+            image_url,
+            sort_order
+          ),
           product_categories (
             categories (
               name
@@ -49,7 +61,13 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setProducts(data || []);
+
+      const productsWithSortedImages = (data || []).map(product => ({
+        ...product,
+        product_images: product.product_images?.sort((a, b) => a.sort_order - b.sort_order)
+      }));
+
+      setProducts(productsWithSortedImages);
     } catch (error) {
       console.error('Error loading products:', error);
     } finally {
@@ -77,15 +95,18 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     );
   }
 
-  const allProducts = products.map(p => ({
-    id: p.id,
-    name: p.name,
-    description: p.description,
-    price: p.price,
-    image: p.main_image_url || 'https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=400',
-    onSale: !!p.discount_price,
-    category: p.product_categories?.[0]?.categories?.name?.toUpperCase() || ''
-  }));
+  const allProducts = products.map(p => {
+    const firstImage = p.product_images && p.product_images.length > 0
+      ? p.product_images[0].image_url
+      : p.main_image_url;
+
+    return {
+      ...p,
+      image: firstImage || 'https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=400',
+      onSale: !!p.discount_price,
+      category: p.product_categories?.[0]?.categories?.name?.toUpperCase() || ''
+    };
+  });
 
   const filteredProducts = selectedCategory
     ? allProducts.filter(product => product.category === selectedCategory)
