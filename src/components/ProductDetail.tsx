@@ -7,7 +7,7 @@ import { useCart } from '../contexts/CartContext';
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addItem } = useCart();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [product, setProduct] = useState<Product | null>(null);
   const [images, setImages] = useState<ProductImage[]>([]);
@@ -48,12 +48,17 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (product) {
-      addToCart({
+      const imageUrl = images[0]?.image_url || product.main_image_url || '';
+
+      addItem({
         id: product.id,
         name: product.name,
-        price: product.discount_price || product.price,
-        image: images[0]?.image_url || product.main_image_url || '',
-        quantity: 1
+        price: product.price,
+        discount_price: product.discount_price,
+        quantity: 1,
+        image_url: imageUrl,
+        sku: product.sku,
+        stock_quantity: product.stock_quantity
       });
     }
   };
