@@ -1,92 +1,105 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
-
-interface ProductDetailData {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  images: string[];
-  onSale: boolean;
-  specifications: {
-    label: string;
-    value: string;
-  }[];
-  fullDescription: string;
-}
+import { ChevronLeft, ChevronRight, ArrowLeft, ShoppingCart } from 'lucide-react';
+import { getProductById, Product, ProductImage } from '../lib/products';
+import { useCart } from '../contexts/CartContext';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [images, setImages] = useState<ProductImage[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const productData: { [key: string]: ProductDetailData } = {
-    '1': {
-      id: 1,
-      name: 'Професійна Риболовна Вудка',
-      description: 'Високопродуктивна вудка з вуглецевого волокна з виключною чутливістю',
-      price: 5999,
-      images: [
-        'https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/2398220/pexels-photo-2398220.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/932638/pexels-photo-932638.jpeg?auto=compress&cs=tinysrgb&w=800'
-      ],
-      onSale: false,
-      specifications: [
-        { label: 'Довжина', value: '2.7 м' },
-        { label: 'Матеріал', value: 'Вуглецеве волокно' },
-        { label: 'Тест', value: '10-30 г' },
-        { label: 'Секції', value: '2' },
-        { label: 'Вага', value: '145 г' },
-        { label: 'Транспортна довжина', value: '140 см' }
-      ],
-      fullDescription: 'Преміальна риболовна вудка виготовлена з високоякісного вуглецевого волокна. Ідеально підходить для спінінгової ловлі. Чудова чутливість та міцність. Легка конструкція забезпечує комфорт під час тривалих сесій риболовлі. Оснащена якісними кільцями та надійним котушкотримачем.'
-    },
-    '2': {
-      id: 2,
-      name: 'Преміум Спінінгова Котушка',
-      description: 'Плавна робота з вдосконаленою системою гальмування',
-      price: 3599,
-      images: [
-        'https://images.pexels.com/photos/2398220/pexels-photo-2398220.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/932638/pexels-photo-932638.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/416179/pexels-photo-416179.jpeg?auto=compress&cs=tinysrgb&w=800'
-      ],
-      onSale: true,
-      specifications: [
-        { label: 'Розмір', value: '3000' },
-        { label: 'Підшипники', value: '10+1' },
-        { label: 'Передавальне число', value: '5.2:1' },
-        { label: 'Ємність шпулі', value: '0.25мм/240м' },
-        { label: 'Вага', value: '265 г' },
-        { label: 'Матеріал корпусу', value: 'Алюміній' }
-      ],
-      fullDescription: 'Професійна спінінгова котушка з плавним ходом. Надійна система фрикціону забезпечує точне налаштування. Високоякісні підшипники гарантують довговічність. Ідеально збалансована для тривалої ловлі. Алюмінієвий корпус та композитний ротор.'
+  useEffect(() => {
+    if (id) {
+      loadProduct();
+    }
+  }, [id]);
+
+  const loadProduct = async () => {
+    try {
+      setLoading(true);
+      const data = await getProductById(id!);
+      if (data) {
+        setProduct(data);
+        if (data.product_images && data.product_images.length > 0) {
+          const sortedImages = [...data.product_images].sort((a, b) => a.sort_order - b.sort_order);
+          setImages(sortedImages);
+        } else if (data.main_image_url) {
+          setImages([{
+            id: 'main',
+            product_id: data.id,
+            image_url: data.main_image_url,
+            alt_text: data.name,
+            sort_order: 0,
+            created_at: data.created_at
+          }]);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading product:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const product = productData[id || '1'];
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.discount_price || product.price,
+        image: images[0]?.image_url || product.main_image_url || '',
+        quantity: 1
+      });
+    }
+  };
 
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
-      prev === product.images.length - 1 ? 0 : prev + 1
+      prev === images.length - 1 ? 0 : prev + 1
     );
   };
 
   const prevImage = () => {
     setCurrentImageIndex((prev) =>
-      prev === 0 ? product.images.length - 1 : prev - 1
+      prev === 0 ? images.length - 1 : prev - 1
     );
   };
 
-  if (!product) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-white text-xl">Товар не знайдено</p>
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-yellow-400 border-t-transparent"></div>
       </div>
     );
   }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white text-xl mb-4">Товар не знайдено</p>
+          <button
+            onClick={() => navigate('/')}
+            className="text-yellow-400 hover:text-yellow-300 underline"
+          >
+            Повернутись до каталогу
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const hasDiscount = product.discount_price && product.discount_price < product.price;
+  const displayPrice = hasDiscount ? product.discount_price : product.price;
+  const specifications = product.specifications ? Object.entries(product.specifications).map(([key, value]) => ({
+    label: key,
+    value: String(value)
+  })) : [];
 
   return (
     <div className="min-h-screen bg-slate-900 py-6 sm:py-8">
@@ -103,19 +116,25 @@ const ProductDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 p-4 sm:p-6 lg:p-8">
             <div className="relative">
               <div className="relative aspect-square bg-slate-200 rounded-lg overflow-hidden">
-                <img
-                  src={product.images[currentImageIndex]}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
+                {images.length > 0 ? (
+                  <img
+                    src={images[currentImageIndex].image_url}
+                    alt={images[currentImageIndex].alt_text || product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-400">
+                    Немає зображення
+                  </div>
+                )}
 
-                {product.onSale && (
+                {hasDiscount && (
                   <div className="absolute top-4 right-4 bg-red-600 text-white font-bold px-4 py-2 text-sm rounded-lg shadow-lg">
                     РОЗПРОДАЖ
                   </div>
                 )}
 
-                {product.images.length > 1 && (
+                {images.length > 1 && (
                   <>
                     <button
                       onClick={prevImage}
@@ -135,11 +154,11 @@ const ProductDetail = () => {
                 )}
               </div>
 
-              {product.images.length > 1 && (
+              {images.length > 1 && (
                 <div className="flex gap-2 sm:gap-3 mt-4 overflow-x-auto pb-2">
-                  {product.images.map((image, index) => (
+                  {images.map((image, index) => (
                     <button
-                      key={index}
+                      key={image.id}
                       onClick={() => setCurrentImageIndex(index)}
                       className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all ${
                         index === currentImageIndex
@@ -148,8 +167,8 @@ const ProductDetail = () => {
                       }`}
                     >
                       <img
-                        src={image}
-                        alt={`${product.name} ${index + 1}`}
+                        src={image.image_url}
+                        alt={image.alt_text || `${product.name} ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
                     </button>
@@ -163,45 +182,79 @@ const ProductDetail = () => {
                 {product.name}
               </h1>
 
+              {product.brand && (
+                <p className="text-sm text-slate-500 mb-2">Бренд: {product.brand}</p>
+              )}
+
               <p className="text-base sm:text-lg text-slate-600 mb-4 sm:mb-6">
                 {product.description}
               </p>
 
               <div className="mb-6 sm:mb-8">
-                <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900">
-                  {product.price.toLocaleString('uk-UA')} ₴
-                </span>
+                {hasDiscount ? (
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-red-600">
+                      {displayPrice!.toLocaleString('uk-UA')} ₴
+                    </span>
+                    <span className="text-xl sm:text-2xl text-slate-400 line-through">
+                      {product.price.toLocaleString('uk-UA')} ₴
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900">
+                    {displayPrice.toLocaleString('uk-UA')} ₴
+                  </span>
+                )}
               </div>
 
-              <button className="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold py-3 sm:py-4 px-6 rounded-lg transition-colors duration-200 mb-6 sm:mb-8 text-base sm:text-lg">
-                Додати до кошика
-              </button>
+              {product.stock_quantity > 0 ? (
+                <>
+                  <button
+                    onClick={handleAddToCart}
+                    className="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold py-3 sm:py-4 px-6 rounded-lg transition-colors duration-200 mb-6 sm:mb-8 text-base sm:text-lg flex items-center justify-center gap-2"
+                  >
+                    <ShoppingCart size={20} />
+                    Додати до кошика
+                  </button>
+                  <p className="text-sm text-green-600 mb-6">
+                    В наявності: {product.stock_quantity} шт.
+                  </p>
+                </>
+              ) : (
+                <div className="mb-6 sm:mb-8">
+                  <p className="text-red-600 font-semibold">Немає в наявності</p>
+                </div>
+              )}
 
-              <div className="border-t border-slate-200 pt-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-4">
-                  Характеристики
-                </h2>
-                <dl className="space-y-3">
-                  {product.specifications.map((spec, index) => (
-                    <div
-                      key={index}
-                      className="flex justify-between py-2 border-b border-slate-100 text-sm sm:text-base"
-                    >
-                      <dt className="text-slate-600 font-medium">{spec.label}</dt>
-                      <dd className="text-slate-900 font-semibold">{spec.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
+              {specifications.length > 0 && (
+                <div className="border-t border-slate-200 pt-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-4">
+                    Характеристики
+                  </h2>
+                  <dl className="space-y-3">
+                    {specifications.map((spec, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between py-2 border-b border-slate-100 text-sm sm:text-base"
+                      >
+                        <dt className="text-slate-600 font-medium">{spec.label}</dt>
+                        <dd className="text-slate-900 font-semibold">{spec.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
 
-              <div className="border-t border-slate-200 pt-6 mt-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-4">
-                  Опис товару
-                </h2>
-                <p className="text-slate-700 leading-relaxed text-sm sm:text-base">
-                  {product.fullDescription}
-                </p>
-              </div>
+              {product.full_description && (
+                <div className="border-t border-slate-200 pt-6 mt-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-4">
+                    Опис товару
+                  </h2>
+                  <p className="text-slate-700 leading-relaxed text-sm sm:text-base whitespace-pre-line">
+                    {product.full_description}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
