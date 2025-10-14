@@ -1,5 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { CartProvider } from './contexts/CartContext';
 import Home from './pages/Home';
+import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
 import ProductDetail from './components/ProductDetail';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -12,8 +15,9 @@ import AdminBannerForm from './pages/admin/AdminBannerForm';
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <CartProvider>
+      <Router>
+        <Routes>
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/products" element={<AdminProducts />} />
@@ -42,6 +46,8 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/product/:id" element={<ProductDetail />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
                 </Routes>
               </div>
             </div>
@@ -49,6 +55,7 @@ function App() {
         />
       </Routes>
     </Router>
+  </CartProvider>
   );
 }
 
