@@ -20,12 +20,18 @@ export interface CategoryTreeNode extends Category {
   children: CategoryTreeNode[];
 }
 
-export async function getCategories() {
-  const { data, error } = await supabase
+export async function getCategories(publishedOnly: boolean = false) {
+  let query = supabase
     .from('categories')
     .select('*')
     .order('sort_order', { ascending: true })
     .order('name', { ascending: true });
+
+  if (publishedOnly) {
+    query = query.eq('is_published', true);
+  }
+
+  const { data, error } = await query;
 
   if (error) throw error;
   return data;

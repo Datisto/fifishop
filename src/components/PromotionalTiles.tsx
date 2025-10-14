@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { getCategories, Category } from '../lib/categories';
 
 interface PromotionalTilesProps {
   onCategorySelect: (category: string) => void;
@@ -7,101 +8,69 @@ interface PromotionalTilesProps {
 
 const PromotionalTiles = ({ onCategorySelect }: PromotionalTilesProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const tiles = [
-    {
-      title: 'ТОПОВІ ПРОДАЖІ',
-      image: 'https://images.pexels.com/photos/3689772/pexels-photo-3689772.jpeg?auto=compress&cs=tinysrgb&w=800',
-      position: 'center'
-    },
-    {
-      title: 'ВУДКИ ДЛЯ НАХЛИСТУ',
-      image: 'https://images.pexels.com/photos/2398220/pexels-photo-2398220.jpeg?auto=compress&cs=tinysrgb&w=800',
-      position: 'center'
-    },
-    {
-      title: 'РИБОЛОВНІ ЧОВНИ',
-      image: 'https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=800',
-      position: 'center bottom'
-    },
-    {
-      title: 'АКСЕСУАРИ',
-      image: 'https://images.pexels.com/photos/416179/pexels-photo-416179.jpeg?auto=compress&cs=tinysrgb&w=800',
-      position: 'center'
-    },
-    {
-      title: 'СНАСТІ ТА СПОРЯДЖЕННЯ',
-      image: 'https://images.pexels.com/photos/932638/pexels-photo-932638.jpeg?auto=compress&cs=tinysrgb&w=800',
-      position: 'center'
-    },
-    {
-      title: 'СПІНІНГОВІ КОТУШКИ',
-      image: 'https://images.pexels.com/photos/2398220/pexels-photo-2398220.jpeg?auto=compress&cs=tinysrgb&w=800',
-      position: 'center'
-    },
-    {
-      title: 'РИБОЛОВНІ ВОЛОСІНІ',
-      image: 'https://images.pexels.com/photos/932638/pexels-photo-932638.jpeg?auto=compress&cs=tinysrgb&w=800',
-      position: 'center'
-    },
-    {
-      title: 'ПРИМАНКИ ТА НАЖИВКА',
-      image: 'https://images.pexels.com/photos/416179/pexels-photo-416179.jpeg?auto=compress&cs=tinysrgb&w=800',
-      position: 'center'
-    },
-    {
-      title: 'РИБОЛОВНІ ЖИЛЕТИ',
-      image: 'https://images.pexels.com/photos/235725/pexels-photo-235725.jpeg?auto=compress&cs=tinysrgb&w=800',
-      position: 'center'
-    },
-    {
-      title: 'КОРОБКИ ДЛЯ ПРИМАНОК',
-      image: 'https://images.pexels.com/photos/7657988/pexels-photo-7657988.jpeg?auto=compress&cs=tinysrgb&w=800',
-      position: 'center'
-    },
-    {
-      title: 'РИБОЛОВНІ СІТКИ',
-      image: 'https://images.pexels.com/photos/3689772/pexels-photo-3689772.jpeg?auto=compress&cs=tinysrgb&w=800',
-      position: 'center'
-    },
-    {
-      title: 'ВЕЙДЕРСИ',
-      image: 'https://images.pexels.com/photos/235725/pexels-photo-235725.jpeg?auto=compress&cs=tinysrgb&w=800',
-      position: 'center'
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      const data = await getCategories(true);
+      setCategories(data);
+    } catch (error) {
+      console.error('Error loading categories:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  const displayedTiles = isExpanded ? tiles : tiles.slice(0, 5);
+  if (loading) {
+    return (
+      <section className="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-24 sm:h-28 rounded-lg bg-slate-200 animate-pulse" />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  const displayedTiles = isExpanded ? categories : categories.slice(0, 5);
+
+  const defaultImage = 'https://images.pexels.com/photos/3689772/pexels-photo-3689772.jpeg?auto=compress&cs=tinysrgb&w=800';
 
   return (
     <section className="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
-        {displayedTiles.map((tile, index) => (
+        {displayedTiles.map((category) => (
           <div
-            key={index}
-            onClick={() => onCategorySelect(tile.title)}
+            key={category.id}
+            onClick={() => onCategorySelect(category.name.toUpperCase())}
             className="relative h-24 sm:h-28 rounded-lg overflow-hidden shadow-lg group cursor-pointer"
           >
             <div
               className="absolute inset-0 bg-cover transition-transform duration-500 group-hover:scale-110"
               style={{
-                backgroundImage: `url('${tile.image}')`,
-                backgroundPosition: tile.position
+                backgroundImage: `url('${category.icon_url || defaultImage}')`,
+                backgroundPosition: 'center'
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent"></div>
             </div>
 
             <div className="relative h-full flex items-end p-2 sm:p-3">
-              <h3 className="text-xs sm:text-sm font-bold text-white drop-shadow-lg">
-                {tile.title}
+              <h3 className="text-xs sm:text-sm font-bold text-white drop-shadow-lg uppercase">
+                {category.name}
               </h3>
             </div>
           </div>
         ))}
       </div>
 
-      {tiles.length > 5 && (
+      {categories.length > 5 && (
         <div className="flex justify-center mt-3 sm:mt-4">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
@@ -113,7 +82,7 @@ const PromotionalTiles = ({ onCategorySelect }: PromotionalTilesProps) => {
               </>
             ) : (
               <>
-                Показати більше (ще {tiles.length - 5}) <ChevronDown size={18} className="sm:hidden" /><ChevronDown size={20} className="hidden sm:block" />
+                Показати більше (ще {categories.length - 5}) <ChevronDown size={18} className="sm:hidden" /><ChevronDown size={20} className="hidden sm:block" />
               </>
             )}
           </button>
