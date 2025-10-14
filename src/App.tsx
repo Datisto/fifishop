@@ -5,6 +5,8 @@ import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminProductForm from './pages/admin/AdminProductForm';
+import AdminCategories from './pages/admin/AdminCategories';
+import AdminCategoryForm from './pages/admin/AdminCategoryForm';
 
 function App() {
   return (
@@ -15,7 +17,9 @@ function App() {
         <Route path="/admin/products" element={<AdminProducts />} />
         <Route path="/admin/products/new" element={<AdminProductForm />} />
         <Route path="/admin/products/edit/:id" element={<AdminProductForm />} />
-        <Route path="/admin/categories" element={<AdminDashboard />} />
+        <Route path="/admin/categories" element={<AdminCategories />} />
+        <Route path="/admin/categories/new" element={<AdminCategoryForm />} />
+        <Route path="/admin/categories/edit/:id" element={<AdminCategoryForm />} />
         <Route path="/admin/banners" element={<AdminDashboard />} />
         <Route path="/admin/promo-codes" element={<AdminDashboard />} />
 
