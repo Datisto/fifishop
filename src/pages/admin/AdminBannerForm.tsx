@@ -225,7 +225,7 @@ export default function AdminBannerForm() {
                   Посилання (URL) <span className="text-slate-500 font-normal">(необов'язково)</span>
                 </label>
                 <input
-                  type="url"
+                  type="text"
                   name="link_url"
                   value={formData.link_url}
                   onChange={handleChange}
