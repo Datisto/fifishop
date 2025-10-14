@@ -3,6 +3,8 @@ import Home from './pages/Home';
 import ProductDetail from './components/ProductDetail';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminProducts from './pages/admin/AdminProducts';
+import AdminProductForm from './pages/admin/AdminProductForm';
 
 function App() {
   return (
@@ -10,7 +12,9 @@ function App() {
       <Routes>
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/products" element={<AdminDashboard />} />
+        <Route path="/admin/products" element={<AdminProducts />} />
+        <Route path="/admin/products/new" element={<AdminProductForm />} />
+        <Route path="/admin/products/edit/:id" element={<AdminProductForm />} />
         <Route path="/admin/categories" element={<AdminDashboard />} />
         <Route path="/admin/banners" element={<AdminDashboard />} />
         <Route path="/admin/promo-codes" element={<AdminDashboard />} />
