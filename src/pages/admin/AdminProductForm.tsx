@@ -102,18 +102,46 @@ export default function AdminProductForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
-    }));
+    const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: newValue,
+      };
+
+      if (name === 'name') {
+        updated.seo_title = newValue as string;
+      }
+      if (name === 'description') {
+        updated.seo_description = newValue as string;
+      }
+
+      return updated;
+    });
   };
 
   const handleCategoryToggle = (categoryId: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(categoryId)
+    setSelectedCategories((prev) => {
+      const updated = prev.includes(categoryId)
         ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
+        : [...prev, categoryId];
+
+      updateSeoKeywords(updated);
+      return updated;
+    });
+  };
+
+  const updateSeoKeywords = (categoryIds: string[]) => {
+    const selectedCategoryNames = categories
+      .filter(cat => categoryIds.includes(cat.id))
+      .map(cat => cat.name)
+      .join(', ');
+
+    setFormData(prev => ({
+      ...prev,
+      seo_keywords: selectedCategoryNames
+    }));
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -481,39 +509,45 @@ export default function AdminProductForm() {
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   SEO Title
+                  <span className="text-xs text-slate-500 ml-2">(автоматично з "Назва товару")</span>
                 </label>
                 <input
                   type="text"
                   name="seo_title"
                   value={formData.seo_title}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-slate-50"
+                  placeholder="Автоматично заповниться з назви товару"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   SEO Description
+                  <span className="text-xs text-slate-500 ml-2">(автоматично з "Короткий опис")</span>
                 </label>
                 <textarea
                   name="seo_description"
                   value={formData.seo_description}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-slate-50"
+                  placeholder="Автоматично заповниться з короткого опису"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   SEO Keywords
+                  <span className="text-xs text-slate-500 ml-2">(автоматично з категорій)</span>
                 </label>
                 <input
                   type="text"
                   name="seo_keywords"
                   value={formData.seo_keywords}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-slate-50"
+                  placeholder="Автоматично заповниться з обраних категорій"
                 />
               </div>
             </div>
