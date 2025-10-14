@@ -222,14 +222,14 @@ export default function AdminBannerForm() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Посилання (URL)
+                  Посилання (URL) <span className="text-slate-500 font-normal">(необов'язково)</span>
                 </label>
                 <input
                   type="url"
                   name="link_url"
                   value={formData.link_url}
                   onChange={handleChange}
-                  placeholder="https://example.com"
+                  placeholder="https://example.com або залиште пустим для інформаційного банера"
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>

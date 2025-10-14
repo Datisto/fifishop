@@ -37,11 +37,10 @@ function SortableBannerItem({ banner, onEdit, onDelete, onToggle, deleteConfirm 
     transition,
   };
 
-  const positionLabels: Record<string, string> = {
-    hero: 'Головний слайдер',
-    sidebar: 'Бічна панель',
-    footer: 'Підвал',
-    popup: 'Спливаюче вікно',
+  const placementLabels: Record<string, string> = {
+    home: 'Головна сторінка',
+    category: 'Сторінка категорії',
+    promo: 'Промо-сторінка',
   };
 
   return (
@@ -63,7 +62,7 @@ function SortableBannerItem({ banner, onEdit, onDelete, onToggle, deleteConfirm 
       <div className="flex-1">
         <h3 className="font-semibold text-slate-900">{banner.title}</h3>
         <div className="flex items-center gap-4 mt-1 text-sm text-slate-600">
-          <span className="px-2 py-1 bg-slate-100 rounded">{positionLabels[banner.position]}</span>
+          <span className="px-2 py-1 bg-slate-100 rounded">{placementLabels[banner.placement]}</span>
           {banner.link_url && (
             <span className="truncate max-w-xs" title={banner.link_url}>
               {banner.link_url}
@@ -229,18 +228,17 @@ export default function AdminBanners() {
 
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <label className="block text-sm font-medium text-slate-700 mb-2">
-            Фільтр за позицією
+            Фільтр за розміщенням
           </label>
           <select
             value={filterPosition}
             onChange={(e) => setFilterPosition(e.target.value)}
             className="w-full md:w-64 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">Всі позиції</option>
-            <option value="hero">Головний слайдер</option>
-            <option value="sidebar">Бічна панель</option>
-            <option value="footer">Підвал</option>
-            <option value="popup">Спливаюче вікно</option>
+            <option value="">Всі розміщення</option>
+            <option value="home">Головна сторінка</option>
+            <option value="category">Сторінка категорії</option>
+            <option value="promo">Промо-сторінка</option>
           </select>
         </div>
 
