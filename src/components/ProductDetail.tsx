@@ -60,6 +60,8 @@ const ProductDetail = () => {
         sku: product.sku,
         stock_quantity: product.stock_quantity
       });
+
+      navigate('/cart');
     }
   };
 
