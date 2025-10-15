@@ -12,6 +12,8 @@ import AdminCategories from './pages/admin/AdminCategories';
 import AdminCategoryForm from './pages/admin/AdminCategoryForm';
 import AdminBanners from './pages/admin/AdminBanners';
 import AdminBannerForm from './pages/admin/AdminBannerForm';
+import AdminPromoCodes from './pages/admin/AdminPromoCodes';
+import AdminPromoCodeForm from './pages/admin/AdminPromoCodeForm';
 
 function App() {
   return (
@@ -29,7 +31,9 @@ function App() {
         <Route path="/admin/banners" element={<AdminBanners />} />
         <Route path="/admin/banners/new" element={<AdminBannerForm />} />
         <Route path="/admin/banners/edit/:id" element={<AdminBannerForm />} />
-        <Route path="/admin/promo-codes" element={<AdminDashboard />} />
+        <Route path="/admin/promo-codes" element={<AdminPromoCodes />} />
+        <Route path="/admin/promo-codes/new" element={<AdminPromoCodeForm />} />
+        <Route path="/admin/promo-codes/:id" element={<AdminPromoCodeForm />} />
 
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />

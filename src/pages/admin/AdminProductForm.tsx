@@ -225,7 +225,7 @@ export default function AdminProductForm() {
         price: parseFloat(formData.price),
         discount_price: formData.discount_price
           ? parseFloat(formData.discount_price)
-          : null,
+          : undefined,
         stock_quantity: parseInt(formData.stock_quantity),
         main_image_url: mainImageUrl,
       };
@@ -243,7 +243,7 @@ export default function AdminProductForm() {
         }
       }
 
-      await setProductCategories(productId!, selectedCategories);
+      await setProductCategories(productId as string, selectedCategories);
 
       navigate('/admin/products');
     } catch (error) {

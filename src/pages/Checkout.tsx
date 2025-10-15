@@ -1,7 +1,8 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
-import { ShoppingBag, CheckCircle } from 'lucide-react';
+import { ShoppingBag, CheckCircle, Tag, X } from 'lucide-react';
+import { validatePromoCode, PromoCode } from '../lib/promoCodes';
 
 export default function Checkout() {
   const { items, getTotalPrice, clearCart } = useCart();
@@ -20,6 +21,17 @@ export default function Checkout() {
     comment: '',
   });
 
+  const [promoCodeInput, setPromoCodeInput] = useState('');
+  const [validatingPromo, setValidatingPromo] = useState(false);
+  const [appliedPromoCodes, setAppliedPromoCodes] = useState<
+    Array<{
+      code: PromoCode;
+      discount: number;
+      message: string;
+    }>
+  >([]);
+  const [promoError, setPromoError] = useState('');
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -27,6 +39,93 @@ export default function Checkout() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const getSessionId = () => {
+    let sessionId = localStorage.getItem('session_id');
+    if (!sessionId) {
+      sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+      localStorage.setItem('session_id', sessionId);
+    }
+    return sessionId;
+  };
+
+  const handleApplyPromoCode = async () => {
+    if (!promoCodeInput.trim()) {
+      setPromoError('Введіть промокод');
+      return;
+    }
+
+    setValidatingPromo(true);
+    setPromoError('');
+
+    try {
+      const sessionId = getSessionId();
+      const result = await validatePromoCode(
+        promoCodeInput.toUpperCase(),
+        items as any,
+        sessionId
+      );
+
+      if (result.valid && result.promoCode) {
+        if (!result.promoCode.allow_multiple && appliedPromoCodes.length > 0) {
+          setPromoError('Цей промокод не можна комбінувати з іншими');
+          return;
+        }
+
+        const alreadyApplied = appliedPromoCodes.find(
+          (p) => p.code.id === result.promoCode!.id
+        );
+
+        if (alreadyApplied) {
+          setPromoError('Цей промокод вже застосовано');
+          return;
+        }
+
+        let message = '';
+        if (result.promoCode.type === 'fixed') {
+          message = `Знижка −${result.discountAmount} ₴`;
+        } else if (result.promoCode.type === 'percentage') {
+          message = `Знижка −${result.promoCode.discount_value}%`;
+        } else if (result.promoCode.type === 'free_shipping') {
+          message = 'Безкоштовна доставка';
+        } else if (result.promoCode.type === 'gift') {
+          message = `Подарунок: ${result.giftProduct?.name || 'товар'}`;
+        }
+
+        setAppliedPromoCodes((prev) => [
+          ...prev,
+          {
+            code: result.promoCode!,
+            discount: result.discountAmount || 0,
+            message,
+          },
+        ]);
+
+        setPromoCodeInput('');
+      } else {
+        setPromoError(result.error || 'Невірний промокод');
+      }
+    } catch (error) {
+      console.error('Error applying promo code:', error);
+      setPromoError('Помилка застосування промокоду');
+    } finally {
+      setValidatingPromo(false);
+    }
+  };
+
+  const handleRemovePromoCode = (codeId: string) => {
+    setAppliedPromoCodes((prev) => prev.filter((p) => p.code.id !== codeId));
+  };
+
+  const getTotalDiscount = () => {
+    return appliedPromoCodes.reduce((sum, promo) => sum + promo.discount, 0);
+  };
+
+  const getFinalTotal = () => {
+    const subtotal = getTotalPrice();
+    const discount = getTotalDiscount();
+    return Math.max(0, subtotal - discount);
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -258,21 +357,100 @@ export default function Checkout() {
                 ))}
               </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-slate-600">
-                  <span>Товарів:</span>
-                  <span>{items.reduce((sum, item) => sum + item.quantity, 0)} шт</span>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-slate-700">
+                    Промокод
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={promoCodeInput}
+                      onChange={(e) => {
+                        setPromoCodeInput(e.target.value.toUpperCase());
+                        setPromoError('');
+                      }}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleApplyPromoCode();
+                        }
+                      }}
+                      placeholder="Введіть код"
+                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyPromoCode}
+                      disabled={validatingPromo}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                    >
+                      <Tag className="w-4 h-4" />
+                      {validatingPromo ? '...' : 'Застосувати'}
+                    </button>
+                  </div>
+                  {promoError && (
+                    <p className="text-sm text-red-600">{promoError}</p>
+                  )}
                 </div>
 
-                <div className="flex items-center justify-between text-slate-600">
-                  <span>Доставка:</span>
-                  <span>За тарифами перевізника</span>
-                </div>
+                {appliedPromoCodes.length > 0 && (
+                  <div className="space-y-2 border-t border-slate-200 pt-3">
+                    {appliedPromoCodes.map((promo) => (
+                      <div
+                        key={promo.code.id}
+                        className="flex items-center justify-between bg-green-50 p-2 rounded-lg"
+                      >
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-green-800">
+                            {promo.code.name}
+                          </p>
+                          <p className="text-xs text-green-600">{promo.message}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemovePromoCode(promo.code.id)}
+                          className="p-1 hover:bg-green-100 rounded transition-colors"
+                        >
+                          <X className="w-4 h-4 text-green-700" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-                <div className="border-t border-slate-200 pt-3">
-                  <div className="flex items-center justify-between text-xl font-bold text-slate-900">
-                    <span>Разом:</span>
+                <div className="border-t border-slate-200 pt-3 space-y-2">
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span>Товарів:</span>
+                    <span>{items.reduce((sum, item) => sum + item.quantity, 0)} шт</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span>Підсумок:</span>
                     <span>{getTotalPrice().toFixed(2)} ₴</span>
+                  </div>
+
+                  {getTotalDiscount() > 0 && (
+                    <div className="flex items-center justify-between text-green-600">
+                      <span>Знижка:</span>
+                      <span>−{getTotalDiscount().toFixed(2)} ₴</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span>Доставка:</span>
+                    <span>
+                      {appliedPromoCodes.some((p) => p.code.type === 'free_shipping')
+                        ? 'Безкоштовно'
+                        : 'За тарифами'}
+                    </span>
+                  </div>
+
+                  <div className="border-t border-slate-200 pt-3">
+                    <div className="flex items-center justify-between text-xl font-bold text-slate-900">
+                      <span>Разом:</span>
+                      <span>{getFinalTotal().toFixed(2)} ₴</span>
+                    </div>
                   </div>
                 </div>
               </div>
