@@ -436,14 +436,22 @@ export default function Checkout() {
 
                   <div className="flex items-center justify-between text-slate-600">
                     <span>Підсумок:</span>
-                    <span>{getTotalPrice().toFixed(2)} ₴</span>
+                    <span className={getTotalDiscount() > 0 ? 'line-through text-slate-400' : ''}>
+                      {getTotalPrice().toFixed(2)} ₴
+                    </span>
                   </div>
 
                   {getTotalDiscount() > 0 && (
-                    <div className="flex items-center justify-between text-green-600">
-                      <span>Знижка:</span>
-                      <span>−{getTotalDiscount().toFixed(2)} ₴</span>
-                    </div>
+                    <>
+                      <div className="flex items-center justify-between text-green-600 font-medium">
+                        <span>Знижка:</span>
+                        <span>−{getTotalDiscount().toFixed(2)} ₴</span>
+                      </div>
+                      <div className="flex items-center justify-between text-lg font-semibold text-blue-600">
+                        <span>Ціна зі знижкою:</span>
+                        <span>{getFinalTotal().toFixed(2)} ₴</span>
+                      </div>
+                    </>
                   )}
 
                   <div className="flex items-center justify-between text-slate-600">
