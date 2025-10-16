@@ -363,6 +363,24 @@ export async function recordPromoCodeUsage(
     .single();
 
   if (error) throw error;
+
+  const promoCode = await getPromoCodeById(promoCodeId);
+
+  if (promoCode && promoCode.max_uses_total) {
+    const { data: usageData } = await supabase
+      .from('promo_code_usage')
+      .select('id')
+      .eq('promo_code_id', promoCodeId)
+      .eq('success', true);
+
+    if (usageData && usageData.length >= promoCode.max_uses_total) {
+      await supabase
+        .from('promo_codes')
+        .update({ is_active: false })
+        .eq('id', promoCodeId);
+    }
+  }
+
   return data;
 }
 

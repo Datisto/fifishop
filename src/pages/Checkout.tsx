@@ -2,7 +2,7 @@ import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { ShoppingBag, CheckCircle, Tag, X, ArrowLeft } from 'lucide-react';
-import { validatePromoCode, PromoCode } from '../lib/promoCodes';
+import { validatePromoCode, PromoCode, recordPromoCodeUsage } from '../lib/promoCodes';
 
 export default function Checkout() {
   const { items, getTotalPrice, clearCart } = useCart();
@@ -133,6 +133,21 @@ export default function Checkout() {
     setIsSubmitting(true);
 
     try {
+      const sessionId = getSessionId();
+
+      for (const appliedPromo of appliedPromoCodes) {
+        try {
+          await recordPromoCodeUsage(
+            appliedPromo.code.id,
+            appliedPromo.discount,
+            sessionId,
+            'unknown'
+          );
+        } catch (error) {
+          console.error('Error recording promo code usage:', error);
+        }
+      }
+
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       setOrderComplete(true);
