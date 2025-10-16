@@ -1,7 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
-import { ShoppingBag, CheckCircle, Tag, X } from 'lucide-react';
+import { ShoppingBag, CheckCircle, Tag, X, ArrowLeft } from 'lucide-react';
 import { validatePromoCode, PromoCode } from '../lib/promoCodes';
 
 export default function Checkout() {
@@ -192,7 +192,16 @@ export default function Checkout() {
   return (
     <div className="min-h-screen bg-slate-50 py-8">
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-slate-900 mb-8">Оформлення замовлення</h1>
+        <div className="flex items-center gap-4 mb-8">
+          <button
+            onClick={() => navigate('/cart')}
+            className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
+            title="Повернутися до кошика"
+          >
+            <ArrowLeft className="w-6 h-6 text-slate-700" />
+          </button>
+          <h1 className="text-3xl font-bold text-slate-900">Оформлення замовлення</h1>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
