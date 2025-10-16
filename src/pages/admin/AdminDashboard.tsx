@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { Package, FolderTree, ShoppingCart, Tag, TrendingUp } from 'lucide-react';
+import { Package, FolderTree, ShoppingCart, Tag, TrendingUp, Database, Download, Upload } from 'lucide-react';
+import { exportDatabase, importDatabase, downloadBackup, uploadBackup } from '../../lib/database';
 
 interface Stats {
   totalProducts: number;
@@ -22,6 +23,8 @@ export default function AdminDashboard() {
     activePromoCodes: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -58,6 +61,39 @@ export default function AdminDashboard() {
       console.error('Error fetching stats:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const backup = await exportDatabase();
+      downloadBackup(backup);
+      alert('Базу даних успішно експортовано!');
+    } catch (error) {
+      console.error('Error exporting database:', error);
+      alert('Помилка експорту бази даних');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleImport = async () => {
+    if (!confirm('УВАГА: Це видалить всі поточні дані та замінить їх даними з файлу. Продовжити?')) {
+      return;
+    }
+
+    setImporting(true);
+    try {
+      const backup = await uploadBackup();
+      await importDatabase(backup);
+      alert('Базу даних успішно імпортовано!');
+      fetchStats();
+    } catch (error) {
+      console.error('Error importing database:', error);
+      alert('Помилка імпорту бази даних: ' + (error as Error).message);
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -171,6 +207,59 @@ export default function AdminDashboard() {
               <Tag className="w-6 h-6 text-slate-600 group-hover:text-purple-600 mb-2" />
               <p className="font-semibold text-slate-900 group-hover:text-purple-600">Додати промокод</p>
             </a>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-slate-200 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-red-100 p-2 rounded-lg">
+              <Database className="w-5 h-5 text-red-600" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-900">Управління базою даних</h2>
+          </div>
+
+          <p className="text-slate-600 mb-6">
+            Експортуйте або імпортуйте дані бази даних. Імпорт видалить всі поточні дані.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button
+              onClick={handleExport}
+              disabled={exporting}
+              className="p-4 border-2 border-blue-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <div className="flex items-center gap-3">
+                <Download className="w-6 h-6 text-blue-600" />
+                <div className="text-left">
+                  <p className="font-semibold text-slate-900 group-hover:text-blue-600">
+                    {exporting ? 'Експорт...' : 'Експортувати базу даних'}
+                  </p>
+                  <p className="text-sm text-slate-600">Завантажити резервну копію</p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={handleImport}
+              disabled={importing}
+              className="p-4 border-2 border-red-200 rounded-lg hover:border-red-500 hover:bg-red-50 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <div className="flex items-center gap-3">
+                <Upload className="w-6 h-6 text-red-600" />
+                <div className="text-left">
+                  <p className="font-semibold text-slate-900 group-hover:text-red-600">
+                    {importing ? 'Імпорт...' : 'Імпортувати базу даних'}
+                  </p>
+                  <p className="text-sm text-slate-600">Відновити з резервної копії</p>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-yellow-800">
+              <strong>Увага:</strong> Імпорт видалить всі поточні дані та замінить їх даними з файлу. Переконайтеся, що у вас є резервна копія перед імпортом.
+            </p>
           </div>
         </div>
       </div>
