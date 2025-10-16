@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 import {
   getPromoCodes,
@@ -12,6 +12,7 @@ import { Plus, Edit, Trash2, Search, Power } from 'lucide-react';
 
 export default function AdminPromoCodes() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -19,7 +20,7 @@ export default function AdminPromoCodes() {
 
   useEffect(() => {
     fetchPromoCodes();
-  }, [search]);
+  }, [search, location.key]);
 
   const fetchPromoCodes = async () => {
     try {
