@@ -91,17 +91,23 @@ export default function AdminPromoCodeForm() {
       setLoading(true);
       const promo = await getPromoCodeById(id!);
       if (promo) {
-        const validFrom = new Date(promo.valid_from);
-        const validFromLocal = new Date(validFrom.getTime() - validFrom.getTimezoneOffset() * 60000)
-          .toISOString()
-          .slice(0, 16);
+        const validFromDate = new Date(promo.valid_from);
+        const year = validFromDate.getFullYear();
+        const month = String(validFromDate.getMonth() + 1).padStart(2, '0');
+        const day = String(validFromDate.getDate()).padStart(2, '0');
+        const hours = String(validFromDate.getHours()).padStart(2, '0');
+        const minutes = String(validFromDate.getMinutes()).padStart(2, '0');
+        const validFromLocal = `${year}-${month}-${day}T${hours}:${minutes}`;
 
         let validUntilLocal = '';
         if (promo.valid_until) {
-          const validUntil = new Date(promo.valid_until);
-          validUntilLocal = new Date(validUntil.getTime() - validUntil.getTimezoneOffset() * 60000)
-            .toISOString()
-            .slice(0, 16);
+          const validUntilDate = new Date(promo.valid_until);
+          const yearEnd = validUntilDate.getFullYear();
+          const monthEnd = String(validUntilDate.getMonth() + 1).padStart(2, '0');
+          const dayEnd = String(validUntilDate.getDate()).padStart(2, '0');
+          const hoursEnd = String(validUntilDate.getHours()).padStart(2, '0');
+          const minutesEnd = String(validUntilDate.getMinutes()).padStart(2, '0');
+          validUntilLocal = `${yearEnd}-${monthEnd}-${dayEnd}T${hoursEnd}:${minutesEnd}`;
         }
 
         setFormData({
