@@ -6,10 +6,10 @@ import { getCategories, Category } from '../lib/categories';
 
 interface HeaderProps {
   onCategorySelect?: (category: string) => void;
-  onSearchChange?: (query: string) => void;
+  onSearchSubmit?: (query: string) => void;
 }
 
-const Header = ({ onCategorySelect, onSearchChange }: HeaderProps) => {
+const Header = ({ onCategorySelect, onSearchSubmit }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,37 +64,43 @@ const Header = ({ onCategorySelect, onSearchChange }: HeaderProps) => {
                 <Menu className="w-6 h-6" />
               </button>
 
-              <div className="hidden lg:block relative w-80">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  onSearchSubmit?.(searchQuery);
+                }}
+                className="hidden lg:block relative w-80"
+              >
                 <input
                   type="text"
                   placeholder="Пошук…"
                   value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    onSearchChange?.(e.target.value);
-                  }}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-4 py-2 pl-10 bg-slate-700/50 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-slate-400"
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-              </div>
+              </form>
             </div>
           </div>
 
-        <div className="lg:hidden mb-3">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSearchSubmit?.(searchQuery);
+          }}
+          className="lg:hidden mb-3"
+        >
           <div className="relative">
             <input
               type="text"
               placeholder="Пошук…"
               value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                onSearchChange?.(e.target.value);
-              }}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-3 py-2 pl-9 bg-slate-700/50 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-slate-400 text-sm"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
           </div>
-        </div>
+        </form>
 
         <nav className="border-t border-slate-700 pt-4">
           <ul className="hidden lg:flex gap-6 justify-center items-center">

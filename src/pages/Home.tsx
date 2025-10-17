@@ -8,13 +8,18 @@ import FeaturedProducts from '../components/FeaturedProducts';
 const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [submittedQuery, setSubmittedQuery] = useState<string>('');
+
+  const handleSearchSubmit = (query: string) => {
+    setSubmittedQuery(query);
+  };
 
   return (
     <>
-      <Header onCategorySelect={setSelectedCategory} onSearchChange={setSearchQuery} />
+      <Header onCategorySelect={setSelectedCategory} onSearchSubmit={handleSearchSubmit} />
       <Hero />
       <PromotionalTiles onCategorySelect={setSelectedCategory} />
-      <FeaturedProducts selectedCategory={selectedCategory} searchQuery={searchQuery} />
+      <FeaturedProducts selectedCategory={selectedCategory} searchQuery={submittedQuery} />
 
       <footer className="bg-slate-900/70 backdrop-blur-md py-8 mt-16">
         <div className="container mx-auto px-4 text-center">
