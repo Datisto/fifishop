@@ -77,7 +77,6 @@ export async function createOrder(orderData: CreateOrderData): Promise<Order> {
     shipping_address: `${orderData.city}, ${orderData.address}${orderData.postal_code ? ', ' + orderData.postal_code : ''}`,
     shipping_method: 'standard',
     payment_method: 'cash',
-    order_number: '',
   };
 
   const { data: order, error: orderError } = await supabase
