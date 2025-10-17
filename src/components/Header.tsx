@@ -34,7 +34,7 @@ const Header = () => {
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onClick={() => navigate('/')}>
-            <img src="/invertInverticon.png" alt="Logo" className="w-7 h-7 sm:w-20 sm:h-20" />
+            <img src="/invertInverticon.png" alt="Logo" className="w-7 h-7 sm:w-17 sm:h-17" />
             <h1 className="text-lg sm:text-2xl font-bold tracking-wide">Fishing Lab</h1>
           </div>
 
