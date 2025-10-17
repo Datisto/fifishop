@@ -132,7 +132,7 @@ const FeaturedProducts = ({ selectedCategory, searchQuery }: FeaturedProductsPro
   const displayProducts = filteredProducts.slice(0, 8);
 
   return (
-    <section ref={sectionRef} className="relative bg-gradient-to-b from-slate-400/0 via-slate-400/20 to-slate-400/60 py-6 sm:py-8">
+    <section ref={sectionRef} data-products-section className="relative bg-gradient-to-b from-slate-400/0 via-slate-400/20 to-slate-400/60 py-6 sm:py-8">
       <div className="container mx-auto px-3 sm:px-4">
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white inline-block relative drop-shadow-lg px-2">

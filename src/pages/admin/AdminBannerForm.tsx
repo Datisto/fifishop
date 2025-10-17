@@ -27,6 +27,7 @@ export default function AdminBannerForm() {
     link_url: '',
     placement: 'home',
     category_id: '',
+    link_type: 'url' as 'url' | 'category',
     is_active: true,
     sort_order: 0,
     start_date: '',
@@ -61,6 +62,7 @@ export default function AdminBannerForm() {
           link_url: banner.link_url || '',
           placement: banner.placement,
           category_id: banner.category_id || '',
+          link_type: banner.category_id ? 'category' : 'url',
           is_active: banner.is_active,
           sort_order: banner.sort_order,
           start_date: banner.start_date ? banner.start_date.split('T')[0] : '',
@@ -135,9 +137,9 @@ export default function AdminBannerForm() {
     try {
       const bannerData = {
         ...formData,
-        category_id: formData.category_id || null,
+        category_id: formData.link_type === 'category' ? (formData.category_id || null) : null,
         mobile_image_url: formData.mobile_image_url || null,
-        link_url: formData.link_url || null,
+        link_url: formData.link_type === 'url' ? (formData.link_url || null) : null,
         start_date: formData.start_date || null,
         end_date: formData.end_date || null,
       };
@@ -220,37 +222,70 @@ export default function AdminBannerForm() {
                 </select>
               </div>
 
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Посилання (URL) <span className="text-slate-500 font-normal">(необов'язково)</span>
+                  Тип посилання
                 </label>
-                <input
-                  type="text"
-                  name="link_url"
-                  value={formData.link_url}
-                  onChange={handleChange}
-                  placeholder="https://example.com або залиште пустим для інформаційного банера"
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+                <div className="flex gap-4 mb-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="link_type"
+                      value="url"
+                      checked={formData.link_type === 'url'}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <span className="text-sm text-slate-700">URL посилання</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="link_type"
+                      value="category"
+                      checked={formData.link_type === 'category'}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <span className="text-sm text-slate-700">Категорія товарів</span>
+                  </label>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Категорія
-                </label>
-                <select
-                  name="category_id"
-                  value={formData.category_id}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Всі категорії</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
+                {formData.link_type === 'url' ? (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Посилання (URL) <span className="text-slate-500 font-normal">(необов'язково)</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="link_url"
+                      value={formData.link_url}
+                      onChange={handleChange}
+                      placeholder="https://example.com або залиште пустим для інформаційного банера"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Виберіть категорію
+                    </label>
+                    <select
+                      name="category_id"
+                      value={formData.category_id}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">Оберіть категорію...</option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div>

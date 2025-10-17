@@ -25,7 +25,7 @@ const Home = () => {
   return (
     <>
       <Header onCategorySelect={handleCategorySelect} onSearchSubmit={handleSearchSubmit} />
-      <Hero />
+      <Hero onCategorySelect={handleCategorySelect} />
       <PromotionalTiles onCategorySelect={handleCategorySelect} />
       <FeaturedProducts selectedCategory={selectedCategory} searchQuery={submittedQuery} />
 

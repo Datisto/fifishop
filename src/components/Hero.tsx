@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { getBanners, Banner } from '../lib/banners';
 
-const Hero = () => {
+interface HeroProps {
+  onCategorySelect?: (category: string) => void;
+}
+
+const Hero = ({ onCategorySelect }: HeroProps) => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -91,13 +95,28 @@ const Hero = () => {
                   {banner.title}
                 </h2>
 
-                {banner.link_url && (
-                  <a
-                    href={banner.link_url}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-xl sm:rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105 text-sm sm:text-base inline-block"
-                  >
-                    Переглянути
-                  </a>
+                {(banner.link_url || banner.category_id) && (
+                  banner.category_id ? (
+                    <button
+                      onClick={() => {
+                        onCategorySelect?.(banner.category_id!);
+                        const productsSection = document.querySelector('[data-products-section]');
+                        if (productsSection) {
+                          productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-xl sm:rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105 text-sm sm:text-base inline-block"
+                    >
+                      Переглянути
+                    </button>
+                  ) : (
+                    <a
+                      href={banner.link_url}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-xl sm:rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105 text-sm sm:text-base inline-block"
+                    >
+                      Переглянути
+                    </a>
+                  )
                 )}
               </div>
             </div>
