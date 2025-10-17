@@ -6,11 +6,13 @@ import { getCategories, Category } from '../lib/categories';
 
 interface HeaderProps {
   onCategorySelect?: (category: string) => void;
+  onSearchChange?: (query: string) => void;
 }
 
-const Header = ({ onCategorySelect }: HeaderProps) => {
+const Header = ({ onCategorySelect, onSearchChange }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const { getTotalItems } = useCart();
   const navigate = useNavigate();
 
@@ -66,6 +68,11 @@ const Header = ({ onCategorySelect }: HeaderProps) => {
                 <input
                   type="text"
                   placeholder="Пошук…"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    onSearchChange?.(e.target.value);
+                  }}
                   className="w-full px-4 py-2 pl-10 bg-slate-700/50 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-slate-400"
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -78,6 +85,11 @@ const Header = ({ onCategorySelect }: HeaderProps) => {
             <input
               type="text"
               placeholder="Пошук…"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                onSearchChange?.(e.target.value);
+              }}
               className="w-full px-3 py-2 pl-9 bg-slate-700/50 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-slate-400 text-sm"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />

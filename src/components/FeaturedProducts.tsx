@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 
 interface FeaturedProductsProps {
   selectedCategory: string | null;
+  searchQuery?: string;
 }
 
 interface Product {
@@ -26,7 +27,7 @@ interface Product {
   }>;
 }
 
-const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
+const FeaturedProducts = ({ selectedCategory, searchQuery }: FeaturedProductsProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -108,9 +109,18 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
     };
   });
 
-  const filteredProducts = selectedCategory
+  let filteredProducts = selectedCategory
     ? allProducts.filter(product => product.category === selectedCategory)
     : allProducts;
+
+  if (searchQuery && searchQuery.trim()) {
+    const query = searchQuery.toLowerCase();
+    filteredProducts = filteredProducts.filter(product =>
+      product.name.toLowerCase().includes(query) ||
+      product.description?.toLowerCase().includes(query) ||
+      product.category.toLowerCase().includes(query)
+    );
+  }
 
   const displayProducts = filteredProducts.slice(0, 8);
 
@@ -119,7 +129,7 @@ const FeaturedProducts = ({ selectedCategory }: FeaturedProductsProps) => {
       <div className="container mx-auto px-3 sm:px-4">
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white inline-block relative drop-shadow-lg px-2">
-            {selectedCategory || 'РЕКОМЕНДОВАНІ ТОВАРИ'}
+            {searchQuery && searchQuery.trim() ? 'РЕЗУЛЬТАТИ ПОШУКУ' : (selectedCategory || 'РЕКОМЕНДОВАНІ ТОВАРИ')}
             <div className="absolute -bottom-2 sm:-bottom-3 left-0 right-0 h-1 sm:h-1.5 bg-yellow-400 rounded-full shadow-lg"></div>
           </h2>
         </div>
