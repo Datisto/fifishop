@@ -12,6 +12,9 @@ const Home = () => {
 
   const handleSearchSubmit = (query: string) => {
     setSubmittedQuery(query);
+    if (query.trim()) {
+      setSelectedCategory(null);
+    }
   };
 
   return (
