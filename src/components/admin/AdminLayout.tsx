@@ -6,6 +6,7 @@ import {
   FolderTree,
   Image,
   Tag,
+  ShoppingCart,
   LogOut,
   Menu,
   X,
@@ -43,6 +44,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const menuItems = [
     { path: '/admin/dashboard', icon: LayoutDashboard, label: 'Дашборд' },
+    { path: '/admin/orders', icon: ShoppingCart, label: 'Замовлення' },
     { path: '/admin/products', icon: Package, label: 'Товари' },
     { path: '/admin/categories', icon: FolderTree, label: 'Категорії' },
     { path: '/admin/banners', icon: Image, label: 'Банери' },
@@ -73,7 +75,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <ul className="space-y-2">
               {menuItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = location.pathname === item.path;
+                const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
 
                 return (
                   <li key={item.path}>

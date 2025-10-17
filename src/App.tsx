@@ -14,6 +14,8 @@ import AdminBanners from './pages/admin/AdminBanners';
 import AdminBannerForm from './pages/admin/AdminBannerForm';
 import AdminPromoCodes from './pages/admin/AdminPromoCodes';
 import AdminPromoCodeForm from './pages/admin/AdminPromoCodeForm';
+import AdminOrders from './pages/admin/AdminOrders';
+import AdminOrderDetail from './pages/admin/AdminOrderDetail';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
@@ -40,6 +42,8 @@ function App() {
         <Route path="/admin/promo-codes" element={<ProtectedRoute><AdminPromoCodes /></ProtectedRoute>} />
         <Route path="/admin/promo-codes/new" element={<ProtectedRoute><AdminPromoCodeForm /></ProtectedRoute>} />
         <Route path="/admin/promo-codes/:id" element={<ProtectedRoute><AdminPromoCodeForm /></ProtectedRoute>} />
+        <Route path="/admin/orders" element={<ProtectedRoute><AdminOrders /></ProtectedRoute>} />
+        <Route path="/admin/orders/:id" element={<ProtectedRoute><AdminOrderDetail /></ProtectedRoute>} />
 
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />

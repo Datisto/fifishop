@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { ShoppingBag, CheckCircle, Tag, X, ArrowLeft } from 'lucide-react';
 import { validatePromoCode, PromoCode, recordPromoCodeUsage } from '../lib/promoCodes';
+import { createOrder, sendTelegramNotification, OrderItem, OrderPromoCode } from '../lib/orders';
 
 export default function Checkout() {
   const { items, getTotalPrice, clearCart } = useCart();
@@ -134,6 +135,43 @@ export default function Checkout() {
 
     try {
       const sessionId = getSessionId();
+      const subtotalAmount = getTotalPrice();
+      const discountAmount = getTotalDiscount();
+      const totalAmount = getFinalTotal();
+
+      const orderItems: OrderItem[] = items.map((item) => ({
+        product_id: item.id,
+        product_name: item.name,
+        product_sku: item.sku,
+        price: item.price,
+        discount_price: item.discount_price || undefined,
+        quantity: item.quantity,
+        subtotal: (item.discount_price || item.price) * item.quantity,
+        is_on_sale: !!item.discount_price && item.discount_price < item.price,
+      }));
+
+      const orderPromoCodes: OrderPromoCode[] = appliedPromoCodes.map((promo) => ({
+        promo_code_id: promo.code.id,
+        promo_code_name: promo.code.name,
+        promo_code_description: promo.message,
+        discount_amount: promo.discount,
+      }));
+
+      const order = await createOrder({
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        city: formData.city,
+        address: formData.address,
+        postal_code: formData.postalCode,
+        comment: formData.comment,
+        items: orderItems,
+        promo_codes: orderPromoCodes,
+        subtotal_amount: subtotalAmount,
+        discount_amount: discountAmount,
+        total_amount: totalAmount,
+      });
 
       for (const appliedPromo of appliedPromoCodes) {
         try {
@@ -141,14 +179,20 @@ export default function Checkout() {
             appliedPromo.code.id,
             appliedPromo.discount,
             sessionId,
-            'unknown'
+            'unknown',
+            undefined,
+            order.id
           );
         } catch (error) {
           console.error('Error recording promo code usage:', error);
         }
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      try {
+        await sendTelegramNotification(order, orderItems, orderPromoCodes);
+      } catch (error) {
+        console.error('Error sending Telegram notification:', error);
+      }
 
       setOrderComplete(true);
       clearCart();
@@ -158,7 +202,7 @@ export default function Checkout() {
       }, 3000);
     } catch (error) {
       console.error('Error submitting order:', error);
-      alert('Помилка оформлення замовлення');
+      alert('Помилка оформлення замовлення. Спробуйте ще раз.');
     } finally {
       setIsSubmitting(false);
     }
