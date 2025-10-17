@@ -19,10 +19,11 @@ const Header = () => {
   const fetchCategories = async () => {
     try {
       const data = await getCategories(true);
-      const topCategories = data
-        .filter(cat => !cat.parent_id)
+      const headerCategories = data
+        .filter((cat: any) => cat.show_in_header)
+        .sort((a: any, b: any) => a.header_sort_order - b.header_sort_order)
         .slice(0, 8);
-      setCategories(topCategories);
+      setCategories(headerCategories);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -87,10 +88,10 @@ const Header = () => {
                   href={`#category-${category.slug}`}
                   className="flex flex-col items-center gap-2 group hover:scale-105 transition-transform duration-200"
                 >
-                  {category.icon_url ? (
+                  {((category as any).header_icon_url || category.icon_url) ? (
                     <div className="w-12 h-12 flex items-center justify-center">
                       <img
-                        src={category.icon_url}
+                        src={(category as any).header_icon_url || category.icon_url}
                         alt={category.name}
                         className="w-full h-full object-contain opacity-90 group-hover:opacity-100 transition-opacity"
                       />
@@ -116,10 +117,10 @@ const Header = () => {
                     href={`#category-${category.slug}`}
                     className="flex items-center gap-3 p-3 hover:bg-slate-700/50 rounded-lg transition-colors"
                   >
-                    {category.icon_url ? (
+                    {((category as any).header_icon_url || category.icon_url) ? (
                       <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
                         <img
-                          src={category.icon_url}
+                          src={(category as any).header_icon_url || category.icon_url}
                           alt={category.name}
                           className="w-full h-full object-contain opacity-90"
                         />
