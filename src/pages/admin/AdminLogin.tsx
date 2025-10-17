@@ -95,11 +95,6 @@ export default function AdminLogin() {
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-slate-200">
-            <p className="text-center text-sm text-slate-600">
-              Логін: ADMIN, Пароль: ADMIN
-            </p>
-          </div>
         </div>
 
         <div className="mt-6 text-center">

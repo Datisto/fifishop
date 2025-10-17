@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
 import Home from './pages/Home';
 import Cart from './pages/Cart';
@@ -15,25 +15,31 @@ import AdminBannerForm from './pages/admin/AdminBannerForm';
 import AdminPromoCodes from './pages/admin/AdminPromoCodes';
 import AdminPromoCodeForm from './pages/admin/AdminPromoCodeForm';
 
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+  return isLoggedIn ? <>{children}</> : <Navigate to="/admin/login" replace />;
+};
+
 function App() {
   return (
     <Router>
       <CartProvider>
         <Routes>
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/products" element={<AdminProducts />} />
-        <Route path="/admin/products/new" element={<AdminProductForm />} />
-        <Route path="/admin/products/edit/:id" element={<AdminProductForm />} />
-        <Route path="/admin/categories" element={<AdminCategories />} />
-        <Route path="/admin/categories/new" element={<AdminCategoryForm />} />
-        <Route path="/admin/categories/edit/:id" element={<AdminCategoryForm />} />
-        <Route path="/admin/banners" element={<AdminBanners />} />
-        <Route path="/admin/banners/new" element={<AdminBannerForm />} />
-        <Route path="/admin/banners/edit/:id" element={<AdminBannerForm />} />
-        <Route path="/admin/promo-codes" element={<AdminPromoCodes />} />
-        <Route path="/admin/promo-codes/new" element={<AdminPromoCodeForm />} />
-        <Route path="/admin/promo-codes/:id" element={<AdminPromoCodeForm />} />
+        <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+        <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
+        <Route path="/admin/products/new" element={<ProtectedRoute><AdminProductForm /></ProtectedRoute>} />
+        <Route path="/admin/products/edit/:id" element={<ProtectedRoute><AdminProductForm /></ProtectedRoute>} />
+        <Route path="/admin/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
+        <Route path="/admin/categories/new" element={<ProtectedRoute><AdminCategoryForm /></ProtectedRoute>} />
+        <Route path="/admin/categories/edit/:id" element={<ProtectedRoute><AdminCategoryForm /></ProtectedRoute>} />
+        <Route path="/admin/banners" element={<ProtectedRoute><AdminBanners /></ProtectedRoute>} />
+        <Route path="/admin/banners/new" element={<ProtectedRoute><AdminBannerForm /></ProtectedRoute>} />
+        <Route path="/admin/banners/edit/:id" element={<ProtectedRoute><AdminBannerForm /></ProtectedRoute>} />
+        <Route path="/admin/promo-codes" element={<ProtectedRoute><AdminPromoCodes /></ProtectedRoute>} />
+        <Route path="/admin/promo-codes/new" element={<ProtectedRoute><AdminPromoCodeForm /></ProtectedRoute>} />
+        <Route path="/admin/promo-codes/:id" element={<ProtectedRoute><AdminPromoCodeForm /></ProtectedRoute>} />
 
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />

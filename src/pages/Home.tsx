@@ -31,13 +31,9 @@ const Home = () => {
 
       <footer className="bg-slate-900/70 backdrop-blur-md py-8 mt-16">
         <div className="container mx-auto px-4 text-center">
-          <Link
-            to="/admin/login"
-            className="text-xs text-slate-500 hover:text-slate-400 transition-colors"
-            title="Логін: ADMIN, Пароль: ADMIN"
-          >
-            admin
-          </Link>
+          <p className="text-xs text-slate-500">
+            © 2025 Всі права захищені
+          </p>
         </div>
       </footer>
     </>
