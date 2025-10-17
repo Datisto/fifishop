@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ProductCard from './ProductCard';
 import { supabase } from '../lib/supabase';
 
@@ -30,10 +30,17 @@ interface Product {
 const FeaturedProducts = ({ selectedCategory, searchQuery }: FeaturedProductsProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     loadProducts();
   }, []);
+
+  useEffect(() => {
+    if (searchQuery && searchQuery.trim() && sectionRef.current) {
+      sectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [searchQuery]);
 
   const loadProducts = async () => {
     try {
@@ -125,7 +132,7 @@ const FeaturedProducts = ({ selectedCategory, searchQuery }: FeaturedProductsPro
   const displayProducts = filteredProducts.slice(0, 8);
 
   return (
-    <section className="relative bg-gradient-to-b from-slate-400/0 via-slate-400/20 to-slate-400/60 py-6 sm:py-8">
+    <section ref={sectionRef} className="relative bg-gradient-to-b from-slate-400/0 via-slate-400/20 to-slate-400/60 py-6 sm:py-8">
       <div className="container mx-auto px-3 sm:px-4">
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white inline-block relative drop-shadow-lg px-2">
