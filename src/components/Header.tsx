@@ -1,15 +1,32 @@
 import { Search, Fish, Menu, ShoppingCart } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
+import { getCategories, Category } from '../lib/categories';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const { getTotalItems } = useCart();
   const navigate = useNavigate();
-  const navItems = ['Аксесуари', 'Приманки', 'Вудки та Котушки', 'Човни', 'Одяг', 'Воблери'];
 
   const totalItems = getTotalItems();
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const data = await getCategories(true);
+      const topCategories = data
+        .filter(cat => !cat.parent_id)
+        .slice(0, 8);
+      setCategories(topCategories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   return (
     <header className="bg-slate-900/70 backdrop-blur-md text-white shadow-lg relative z-50">
@@ -62,29 +79,59 @@ const Header = () => {
           </div>
         </div>
 
-        <nav className="border-t border-slate-700 pt-3">
-          <ul className="hidden lg:flex space-x-8 justify-center">
-            {navItems.map((item) => (
-              <li key={item}>
+        <nav className="border-t border-slate-700 pt-4">
+          <ul className="hidden lg:flex gap-6 justify-center items-center">
+            {categories.map((category) => (
+              <li key={category.id}>
                 <a
-                  href="#"
-                  className="text-sm font-medium hover:text-yellow-400 transition-colors duration-200"
+                  href={`#category-${category.slug}`}
+                  className="flex flex-col items-center gap-2 group hover:scale-105 transition-transform duration-200"
                 >
-                  {item}
+                  {category.icon_url ? (
+                    <div className="w-12 h-12 flex items-center justify-center">
+                      <img
+                        src={category.icon_url}
+                        alt={category.name}
+                        className="w-full h-full object-contain opacity-90 group-hover:opacity-100 transition-opacity"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 bg-slate-700/50 rounded-lg flex items-center justify-center">
+                      <Fish className="w-6 h-6 text-slate-400" />
+                    </div>
+                  )}
+                  <span className="text-xs font-medium text-slate-300 group-hover:text-yellow-400 transition-colors text-center">
+                    {category.name}
+                  </span>
                 </a>
               </li>
             ))}
           </ul>
 
           {isMenuOpen && (
-            <ul className="lg:hidden flex flex-col space-y-2">
-              {navItems.map((item) => (
-                <li key={item}>
+            <ul className="lg:hidden grid grid-cols-2 gap-3">
+              {categories.map((category) => (
+                <li key={category.id}>
                   <a
-                    href="#"
-                    className="block text-sm font-medium hover:text-yellow-400 transition-colors duration-200 py-2 hover:bg-slate-700/50 px-3 rounded-lg"
+                    href={`#category-${category.slug}`}
+                    className="flex items-center gap-3 p-3 hover:bg-slate-700/50 rounded-lg transition-colors"
                   >
-                    {item}
+                    {category.icon_url ? (
+                      <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                        <img
+                          src={category.icon_url}
+                          alt={category.name}
+                          className="w-full h-full object-contain opacity-90"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 bg-slate-700/50 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Fish className="w-5 h-5 text-slate-400" />
+                      </div>
+                    )}
+                    <span className="text-sm font-medium text-slate-300">
+                      {category.name}
+                    </span>
                   </a>
                 </li>
               ))}
