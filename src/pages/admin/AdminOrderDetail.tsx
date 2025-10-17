@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Package, User, MapPin, MessageSquare, Tag, AlertCircle } from 'lucide-react';
 import { getOrderById, updateOrderStatus } from '../../lib/orders';
+import AdminLayout from '../../components/admin/AdminLayout';
 
 export default function AdminOrderDetail() {
   const { id } = useParams<{ id: string }>();
@@ -81,48 +82,53 @@ export default function AdminOrderDetail() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Завантаження замовлення...</p>
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-slate-600">Завантаження замовлення...</p>
+          </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   if (error || !order) {
     return (
-      <div className="space-y-4">
-        <button
-          onClick={() => navigate('/admin/orders')}
-          className="flex items-center gap-2 text-slate-600 hover:text-slate-900"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Назад до замовлень
-        </button>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-center gap-2 text-red-800">
-            <AlertCircle className="w-5 h-5" />
-            <p>{error || 'Замовлення не знайдено'}</p>
+      <AdminLayout>
+        <div className="space-y-4">
+          <button
+            onClick={() => navigate('/admin/orders')}
+            className="flex items-center gap-2 text-slate-600 hover:text-slate-900"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Назад до замовлень
+          </button>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-red-800">
+              <AlertCircle className="w-5 h-5" />
+              <p>{error || 'Замовлення не знайдено'}</p>
+            </div>
           </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => navigate('/admin/orders')}
-          className="flex items-center gap-2 text-slate-600 hover:text-slate-900"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Назад до замовлень
-        </button>
-      </div>
+    <AdminLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => navigate('/admin/orders')}
+            className="flex items-center gap-2 text-slate-600 hover:text-slate-900"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Назад до замовлень
+          </button>
+        </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <div className="bg-white rounded-xl border border-slate-200 p-6">
         <div className="flex items-start justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">
@@ -317,7 +323,8 @@ export default function AdminOrderDetail() {
             </div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
