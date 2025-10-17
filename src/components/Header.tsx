@@ -4,7 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { getCategories, Category } from '../lib/categories';
 
-const Header = () => {
+interface HeaderProps {
+  onCategorySelect?: (category: string) => void;
+}
+
+const Header = ({ onCategorySelect }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const { getTotalItems } = useCart();
@@ -84,8 +88,8 @@ const Header = () => {
           <ul className="hidden lg:flex gap-6 justify-center items-center">
             {categories.map((category) => (
               <li key={category.id}>
-                <a
-                  href={`#category-${category.slug}`}
+                <button
+                  onClick={() => onCategorySelect?.(category.name.toUpperCase())}
                   className="flex flex-col items-center gap-2 group hover:scale-105 transition-transform duration-200"
                 >
                   {((category as any).header_icon_url || category.icon_url) ? (
@@ -104,7 +108,7 @@ const Header = () => {
                   <span className="text-xs font-medium text-slate-300 group-hover:text-yellow-400 transition-colors text-center">
                     {category.name}
                   </span>
-                </a>
+                </button>
               </li>
             ))}
           </ul>
@@ -113,9 +117,12 @@ const Header = () => {
             <ul className="lg:hidden grid grid-cols-2 gap-3">
               {categories.map((category) => (
                 <li key={category.id}>
-                  <a
-                    href={`#category-${category.slug}`}
-                    className="flex items-center gap-3 p-3 hover:bg-slate-700/50 rounded-lg transition-colors"
+                  <button
+                    onClick={() => {
+                      onCategorySelect?.(category.name.toUpperCase());
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 p-3 hover:bg-slate-700/50 rounded-lg transition-colors w-full"
                   >
                     {((category as any).header_icon_url || category.icon_url) ? (
                       <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
@@ -133,7 +140,7 @@ const Header = () => {
                     <span className="text-sm font-medium text-slate-300">
                       {category.name}
                     </span>
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>

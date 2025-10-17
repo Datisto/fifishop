@@ -10,7 +10,7 @@ const Home = () => {
 
   return (
     <>
-      <Header />
+      <Header onCategorySelect={setSelectedCategory} />
       <Hero />
       <PromotionalTiles onCategorySelect={setSelectedCategory} />
       <FeaturedProducts selectedCategory={selectedCategory} />
