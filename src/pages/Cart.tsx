@@ -8,10 +8,18 @@ export default function Cart() {
     useCart();
   const navigate = useNavigate();
 
+  const handleCategorySelect = (category: string) => {
+    navigate('/', { state: { selectedCategory: category } });
+  };
+
+  const handleSearchSubmit = (query: string) => {
+    navigate('/', { state: { searchQuery: query } });
+  };
+
   if (items.length === 0 && !undoAction) {
     return (
       <>
-        <Header />
+        <Header onCategorySelect={handleCategorySelect} onSearchSubmit={handleSearchSubmit} />
         <div className="min-h-screen bg-slate-50 py-12">
           <div className="container mx-auto px-4">
             <div className="max-w-2xl mx-auto text-center bg-white rounded-2xl p-12 shadow-2xl">
@@ -35,7 +43,7 @@ export default function Cart() {
 
   return (
     <>
-      <Header />
+      <Header onCategorySelect={handleCategorySelect} onSearchSubmit={handleSearchSubmit} />
       <div className="min-h-screen bg-slate-50 py-8">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-bold text-slate-900 mb-8">Кошик</h1>

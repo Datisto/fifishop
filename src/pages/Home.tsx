@@ -1,14 +1,28 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
 import PromotionalTiles from '../components/PromotionalTiles';
 import FeaturedProducts from '../components/FeaturedProducts';
 
 const Home = () => {
+  const location = useLocation();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [submittedQuery, setSubmittedQuery] = useState<string>('');
+
+  useEffect(() => {
+    if (location.state) {
+      if ((location.state as any).selectedCategory) {
+        setSelectedCategory((location.state as any).selectedCategory);
+        setSubmittedQuery('');
+      }
+      if ((location.state as any).searchQuery) {
+        setSubmittedQuery((location.state as any).searchQuery);
+        setSelectedCategory(null);
+      }
+    }
+  }, [location.state]);
 
   const handleSearchSubmit = (query: string) => {
     setSubmittedQuery(query);
