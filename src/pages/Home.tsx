@@ -17,11 +17,16 @@ const Home = () => {
     }
   };
 
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    setSubmittedQuery('');
+  };
+
   return (
     <>
-      <Header onCategorySelect={setSelectedCategory} onSearchSubmit={handleSearchSubmit} />
+      <Header onCategorySelect={handleCategorySelect} onSearchSubmit={handleSearchSubmit} />
       <Hero />
-      <PromotionalTiles onCategorySelect={setSelectedCategory} />
+      <PromotionalTiles onCategorySelect={handleCategorySelect} />
       <FeaturedProducts selectedCategory={selectedCategory} searchQuery={submittedQuery} />
 
       <footer className="bg-slate-900/70 backdrop-blur-md py-8 mt-16">
