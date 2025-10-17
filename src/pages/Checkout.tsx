@@ -156,12 +156,14 @@ export default function Checkout() {
       }));
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       const apiUrl = `${supabaseUrl}/functions/v1/send-telegram-notification`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseAnonKey}`,
         },
         body: JSON.stringify({
           order_number: orderNumber,
