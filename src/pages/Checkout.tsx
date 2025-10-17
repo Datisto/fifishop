@@ -2,8 +2,7 @@ import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { ShoppingBag, CheckCircle, Tag, X, ArrowLeft } from 'lucide-react';
-import { validatePromoCode, PromoCode, recordPromoCodeUsage } from '../lib/promoCodes';
-import { createOrder, sendTelegramNotification, OrderItem, OrderPromoCode } from '../lib/orders';
+import { validatePromoCode, PromoCode } from '../lib/promoCodes';
 
 export default function Checkout() {
   const { items, getTotalPrice, clearCart } = useCart();
@@ -134,13 +133,13 @@ export default function Checkout() {
     setIsSubmitting(true);
 
     try {
-      const sessionId = getSessionId();
       const subtotalAmount = getTotalPrice();
       const discountAmount = getTotalDiscount();
       const totalAmount = getFinalTotal();
 
-      const orderItems: OrderItem[] = items.map((item) => ({
-        product_id: item.id,
+      const orderNumber = `ORD-${Date.now()}`;
+
+      const orderItems = items.map((item) => ({
         product_name: item.name,
         product_sku: item.sku,
         price: item.price,
@@ -150,48 +149,42 @@ export default function Checkout() {
         is_on_sale: !!item.discount_price && item.discount_price < item.price,
       }));
 
-      const orderPromoCodes: OrderPromoCode[] = appliedPromoCodes.map((promo) => ({
-        promo_code_id: promo.code.id,
+      const orderPromoCodes = appliedPromoCodes.map((promo) => ({
         promo_code_name: promo.code.name,
         promo_code_description: promo.message,
         discount_amount: promo.discount,
       }));
 
-      const order = await createOrder({
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        city: formData.city,
-        address: formData.address,
-        postal_code: formData.postalCode,
-        comment: formData.comment,
-        items: orderItems,
-        promo_codes: orderPromoCodes,
-        subtotal_amount: subtotalAmount,
-        discount_amount: discountAmount,
-        total_amount: totalAmount,
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const apiUrl = `${supabaseUrl}/functions/v1/send-telegram-notification`;
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          order_number: orderNumber,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          city: formData.city,
+          address: formData.address,
+          postal_code: formData.postalCode,
+          comment: formData.comment,
+          items: orderItems,
+          subtotal_amount: subtotalAmount,
+          discount_amount: discountAmount,
+          total_amount: totalAmount,
+          promo_codes: orderPromoCodes,
+        }),
       });
 
-      for (const appliedPromo of appliedPromoCodes) {
-        try {
-          await recordPromoCodeUsage(
-            appliedPromo.code.id,
-            appliedPromo.discount,
-            sessionId,
-            'unknown',
-            undefined,
-            order.id
-          );
-        } catch (error) {
-          console.error('Error recording promo code usage:', error);
-        }
-      }
+      const result = await response.json();
 
-      try {
-        await sendTelegramNotification(order, orderItems, orderPromoCodes);
-      } catch (error) {
-        console.error('Error sending Telegram notification:', error);
+      if (!result.success) {
+        throw new Error('Failed to send notification');
       }
 
       setOrderComplete(true);

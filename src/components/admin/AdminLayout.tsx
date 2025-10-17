@@ -6,7 +6,6 @@ import {
   FolderTree,
   Image,
   Tag,
-  ShoppingCart,
   LogOut,
   Menu,
   X,
@@ -44,7 +43,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const menuItems = [
     { path: '/admin/dashboard', icon: LayoutDashboard, label: 'Дашборд' },
-    { path: '/admin/orders', icon: ShoppingCart, label: 'Замовлення' },
     { path: '/admin/products', icon: Package, label: 'Товари' },
     { path: '/admin/categories', icon: FolderTree, label: 'Категорії' },
     { path: '/admin/banners', icon: Image, label: 'Банери' },
