@@ -2,8 +2,8 @@ import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User, AlertCircle } from 'lucide-react';
 
-const ADMIN_USERNAME = 'ADMIN';
-const ADMIN_PASSWORD = 'ADMIN';
+const ADMIN_USERNAME = 'NazarFL5492';
+const ADMIN_PASSWORD = 'reelFL332265';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
@@ -63,7 +63,7 @@ export default function AdminLogin() {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   className="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="ADMIN"
+                  placeholder="NazarFL5492"
                 />
               </div>
             </div>
@@ -81,7 +81,7 @@ export default function AdminLogin() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="ADMIN"
+                  placeholder="••••••••••••"
                 />
               </div>
             </div>

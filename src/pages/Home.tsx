@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
 import PromotionalTiles from '../components/PromotionalTiles';
@@ -44,10 +44,18 @@ const Home = () => {
       <FeaturedProducts selectedCategory={selectedCategory} searchQuery={submittedQuery} />
 
       <footer className="bg-slate-900/70 backdrop-blur-md py-8 mt-16">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-xs text-slate-500">
-            © 2025 Всі права захищені
-          </p>
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-slate-500">
+              © 2025 Всі права захищені
+            </p>
+            <Link
+              to="/admin/login"
+              className="text-[10px] text-slate-600/40 hover:text-slate-500/60 transition-colors"
+            >
+              •
+            </Link>
+          </div>
         </div>
       </footer>
     </>
