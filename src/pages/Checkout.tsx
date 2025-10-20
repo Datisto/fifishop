@@ -2,7 +2,7 @@ import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { ShoppingBag, CheckCircle, Tag, X, ArrowLeft } from 'lucide-react';
-import { validatePromoCode, PromoCode } from '../lib/firestore/promoCodes';
+import { validatePromoCode, PromoCode } from '../lib/promoCodes';
 
 export default function Checkout() {
   const { items, getTotalPrice, clearCart } = useCart();

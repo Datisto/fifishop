@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { supabase } from '../../lib/supabase';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { Package, FolderTree, ShoppingCart, Tag, TrendingUp, Database, Download, Upload } from 'lucide-react';
-import { exportDatabase, importDatabase, downloadBackup, uploadBackup } from '../../lib/firestore/database';
+import { exportDatabase, importDatabase, downloadBackup, uploadBackup } from '../../lib/database';
 
 interface Stats {
   totalProducts: number;
@@ -33,31 +32,30 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const productsRef = collection(db, 'products');
-      const categoriesRef = collection(db, 'categories');
-      const ordersRef = collection(db, 'orders');
-      const promoCodesRef = collection(db, 'promo_codes');
-
-      const [productsSnap, categoriesSnap, ordersSnap, promoCodesSnap] = await Promise.all([
-        getDocs(productsRef),
-        getDocs(categoriesRef),
-        getDocs(ordersRef),
-        getDocs(promoCodesRef),
+      const [products, categories, orders, promoCodes] = await Promise.all([
+        supabase.from('products').select('*', { count: 'exact', head: true }),
+        supabase.from('categories').select('*', { count: 'exact', head: true }),
+        supabase.from('orders').select('*', { count: 'exact', head: true }),
+        supabase.from('promo_codes').select('*', { count: 'exact', head: true }),
       ]);
 
-      const publishedProductsQuery = query(productsRef, where('is_published', '==', true));
-      const publishedProductsSnap = await getDocs(publishedProductsQuery);
+      const publishedProducts = await supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_published', true);
 
-      const activePromoCodesQuery = query(promoCodesRef, where('is_active', '==', true));
-      const activePromoCodesSnap = await getDocs(activePromoCodesQuery);
+      const activePromoCodes = await supabase
+        .from('promo_codes')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
 
       setStats({
-        totalProducts: productsSnap.size,
-        publishedProducts: publishedProductsSnap.size,
-        totalCategories: categoriesSnap.size,
-        totalOrders: ordersSnap.size,
-        totalPromoCodes: promoCodesSnap.size,
-        activePromoCodes: activePromoCodesSnap.size,
+        totalProducts: products.count || 0,
+        publishedProducts: publishedProducts.count || 0,
+        totalCategories: categories.count || 0,
+        totalOrders: orders.count || 0,
+        totalPromoCodes: promoCodes.count || 0,
+        activePromoCodes: activePromoCodes.count || 0,
       });
     } catch (error) {
       console.error('Error fetching stats:', error);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ArrowLeft, ShoppingCart } from 'lucide-react';
-import { getProductById, Product, ProductImage } from '../lib/firestore/products';
+import { getProductById, Product, ProductImage } from '../lib/products';
 import { useCart } from '../contexts/CartContext';
 
 const ProductDetail = () => {

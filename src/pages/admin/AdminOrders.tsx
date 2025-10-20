@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Package, Search, Eye, Calendar, AlertCircle } from 'lucide-react';
-import { getOrders } from '../../lib/firestore/orders';
+import { getOrders } from '../../lib/orders';
 import AdminLayout from '../../components/admin/AdminLayout';
 
 export default function AdminOrders() {

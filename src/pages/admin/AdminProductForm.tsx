@@ -9,8 +9,8 @@ import {
   addProductImage,
   deleteProductImage,
   setProductCategories,
-} from '../../lib/firestore/products';
-import { getCategories, Category } from '../../lib/firestore/categories';
+} from '../../lib/products';
+import { getCategories, Category } from '../../lib/categories';
 import { Save, ArrowLeft, Upload, X, Image as ImageIcon } from 'lucide-react';
 
 export default function AdminProductForm() {

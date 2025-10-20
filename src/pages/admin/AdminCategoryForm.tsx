@@ -8,7 +8,7 @@ import {
   getCategories,
   uploadCategoryIcon,
   Category,
-} from '../../lib/firestore/categories';
+} from '../../lib/categories';
 import { Save, ArrowLeft, Upload, X } from 'lucide-react';
 
 export default function AdminCategoryForm() {

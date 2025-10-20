@@ -2,7 +2,7 @@ import { Search, Fish, Menu, ShoppingCart } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
-import { getCategories, Category } from '../lib/firestore/categories';
+import { getCategories, Category } from '../lib/categories';
 
 interface HeaderProps {
   onCategorySelect?: (category: string) => void;

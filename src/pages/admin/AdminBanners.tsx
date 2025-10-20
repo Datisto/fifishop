@@ -7,7 +7,7 @@ import {
   toggleBannerActive,
   updateBannersOrder,
   Banner,
-} from '../../lib/firestore/banners';
+} from '../../lib/banners';
 import {
   DndContext,
   closestCenter,

@@ -6,8 +6,8 @@ import {
   updateBanner,
   getBannerById,
   uploadBannerImage,
-} from '../../lib/firestore/banners';
-import { getCategories, Category } from '../../lib/firestore/categories';
+} from '../../lib/banners';
+import { getCategories, Category } from '../../lib/categories';
 import { Save, ArrowLeft, Upload, X } from 'lucide-react';
 
 export default function AdminBannerForm() {
