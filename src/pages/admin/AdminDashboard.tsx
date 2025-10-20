@@ -2,7 +2,16 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { Package, FolderTree, ShoppingCart, Tag, TrendingUp, Database, Download, Upload } from 'lucide-react';
-import { exportDatabase, importDatabase, downloadBackup, uploadBackup } from '../../lib/database';
+import {
+  exportDatabase,
+  importDatabase,
+  downloadBackup,
+  uploadBackup,
+  exportDatabaseWithImages,
+  importDatabaseWithImages,
+  downloadZipBackup,
+  uploadZipBackup
+} from '../../lib/database';
 
 interface Stats {
   totalProducts: number;
@@ -25,6 +34,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState({ current: 0, total: 100, message: '' });
+  const [importProgress, setImportProgress] = useState({ current: 0, total: 100, message: '' });
 
   useEffect(() => {
     fetchStats();
@@ -64,36 +75,61 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleExport = async () => {
+  const handleExport = async (includeImages: boolean = false) => {
     setExporting(true);
+    setExportProgress({ current: 0, total: 100, message: '' });
     try {
-      const backup = await exportDatabase();
-      downloadBackup(backup);
-      alert('Базу даних успішно експортовано!');
+      if (includeImages) {
+        const zipBlob = await exportDatabaseWithImages(
+          (current, total, message) => {
+            setExportProgress({ current, total, message });
+          }
+        );
+        downloadZipBackup(zipBlob);
+        alert('Базу даних з зображеннями успішно експортовано!');
+      } else {
+        const backup = await exportDatabase();
+        downloadBackup(backup);
+        alert('Базу даних успішно експортовано!');
+      }
     } catch (error) {
       console.error('Error exporting database:', error);
       alert('Помилка експорту бази даних');
     } finally {
       setExporting(false);
+      setExportProgress({ current: 0, total: 100, message: '' });
     }
   };
 
-  const handleImport = async () => {
+  const handleImport = async (withImages: boolean = false) => {
     if (!confirm('УВАГА: Це видалить всі поточні дані та замінить їх даними з файлу. Продовжити?')) {
       return;
     }
 
     setImporting(true);
+    setImportProgress({ current: 0, total: 100, message: '' });
     try {
-      const backup = await uploadBackup();
-      await importDatabase(backup);
-      alert('Базу даних успішно імпортовано!');
+      if (withImages) {
+        const zipFile = await uploadZipBackup();
+        await importDatabaseWithImages(
+          zipFile,
+          (current, total, message) => {
+            setImportProgress({ current, total, message });
+          }
+        );
+        alert('Базу даних з зображеннями успішно імпортовано!');
+      } else {
+        const backup = await uploadBackup();
+        await importDatabase(backup);
+        alert('Базу даних успішно імпортовано!');
+      }
       fetchStats();
     } catch (error) {
       console.error('Error importing database:', error);
       alert('Помилка імпорту бази даних: ' + (error as Error).message);
     } finally {
       setImporting(false);
+      setImportProgress({ current: 0, total: 100, message: '' });
     }
   };
 
@@ -222,38 +258,110 @@ export default function AdminDashboard() {
             Експортуйте або імпортуйте дані бази даних. Імпорт видалить всі поточні дані.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <button
-              onClick={handleExport}
-              disabled={exporting}
-              className="p-4 border-2 border-blue-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <div className="flex items-center gap-3">
-                <Download className="w-6 h-6 text-blue-600" />
-                <div className="text-left">
-                  <p className="font-semibold text-slate-900 group-hover:text-blue-600">
-                    {exporting ? 'Експорт...' : 'Експортувати базу даних'}
-                  </p>
-                  <p className="text-sm text-slate-600">Завантажити резервну копію</p>
-                </div>
-              </div>
-            </button>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold text-slate-900 mb-3">Експорт</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button
+                  onClick={() => handleExport(false)}
+                  disabled={exporting || importing}
+                  className="p-4 border-2 border-blue-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="flex items-center gap-3">
+                    <Download className="w-6 h-6 text-blue-600" />
+                    <div className="text-left">
+                      <p className="font-semibold text-slate-900 group-hover:text-blue-600">
+                        Тільки дані (JSON)
+                      </p>
+                      <p className="text-sm text-slate-600">Швидкий експорт без зображень</p>
+                    </div>
+                  </div>
+                </button>
 
-            <button
-              onClick={handleImport}
-              disabled={importing}
-              className="p-4 border-2 border-red-200 rounded-lg hover:border-red-500 hover:bg-red-50 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <div className="flex items-center gap-3">
-                <Upload className="w-6 h-6 text-red-600" />
-                <div className="text-left">
-                  <p className="font-semibold text-slate-900 group-hover:text-red-600">
-                    {importing ? 'Імпорт...' : 'Імпортувати базу даних'}
-                  </p>
-                  <p className="text-sm text-slate-600">Відновити з резервної копії</p>
-                </div>
+                <button
+                  onClick={() => handleExport(true)}
+                  disabled={exporting || importing}
+                  className="p-4 border-2 border-green-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="flex items-center gap-3">
+                    <Download className="w-6 h-6 text-green-600" />
+                    <div className="text-left">
+                      <p className="font-semibold text-slate-900 group-hover:text-green-600">
+                        Повний бекап (ZIP)
+                      </p>
+                      <p className="text-sm text-slate-600">Дані + всі зображення</p>
+                    </div>
+                  </div>
+                </button>
               </div>
-            </button>
+
+              {exporting && exportProgress.message && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-medium text-blue-900">{exportProgress.message}</p>
+                    <p className="text-sm text-blue-700">{exportProgress.current}%</p>
+                  </div>
+                  <div className="w-full bg-blue-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${exportProgress.current}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-slate-900 mb-3">Імпорт</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button
+                  onClick={() => handleImport(false)}
+                  disabled={importing || exporting}
+                  className="p-4 border-2 border-orange-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="flex items-center gap-3">
+                    <Upload className="w-6 h-6 text-orange-600" />
+                    <div className="text-left">
+                      <p className="font-semibold text-slate-900 group-hover:text-orange-600">
+                        Тільки дані (JSON)
+                      </p>
+                      <p className="text-sm text-slate-600">Відновити дані без зображень</p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => handleImport(true)}
+                  disabled={importing || exporting}
+                  className="p-4 border-2 border-red-200 rounded-lg hover:border-red-500 hover:bg-red-50 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="flex items-center gap-3">
+                    <Upload className="w-6 h-6 text-red-600" />
+                    <div className="text-left">
+                      <p className="font-semibold text-slate-900 group-hover:text-red-600">
+                        Повний імпорт (ZIP)
+                      </p>
+                      <p className="text-sm text-slate-600">Дані + зображення</p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              {importing && importProgress.message && (
+                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-medium text-red-900">{importProgress.message}</p>
+                    <p className="text-sm text-red-700">{importProgress.current}%</p>
+                  </div>
+                  <div className="w-full bg-red-200 rounded-full h-2">
+                    <div
+                      className="bg-red-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${importProgress.current}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
