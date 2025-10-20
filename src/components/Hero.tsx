@@ -52,11 +52,7 @@ const Hero = ({ onCategorySelect }: HeroProps) => {
   }
 
   if (banners.length === 0) {
-    return (
-      <section className="relative h-[280px] sm:h-[360px] md:h-[420px] lg:h-[480px] overflow-hidden bg-gradient-to-r from-slate-800 to-slate-900 flex items-center justify-center">
-        <p className="text-white text-xl">Банери не знайдено</p>
-      </section>
-    );
+    return null;
   }
 
   return (
