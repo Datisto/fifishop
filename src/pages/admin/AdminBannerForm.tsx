@@ -136,10 +136,14 @@ export default function AdminBannerForm() {
 
     try {
       const bannerData = {
-        ...formData,
-        category_id: formData.link_type === 'category' ? (formData.category_id || null) : null,
+        title: formData.title,
+        image_url: formData.image_url,
         mobile_image_url: formData.mobile_image_url || null,
         link_url: formData.link_type === 'url' ? (formData.link_url || null) : null,
+        placement: formData.placement,
+        category_id: formData.link_type === 'category' ? (formData.category_id || null) : null,
+        is_active: formData.is_active,
+        sort_order: formData.sort_order,
         start_date: formData.start_date || null,
         end_date: formData.end_date || null,
       };
