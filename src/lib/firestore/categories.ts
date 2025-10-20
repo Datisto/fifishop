@@ -1,17 +1,6 @@
-import {
-  collection,
-  doc,
-  getDocs,
-  getDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  orderBy
-} from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../firebase';
+import { storage } from '../firebase';
+import { supabase } from '../supabase';
 
 export interface Category {
   id: string;
@@ -33,120 +22,136 @@ export interface CategoryTreeNode extends Category {
 }
 
 export async function getCategories(activeOnly: boolean = false) {
-  const categoriesRef = collection(db, 'categories');
-  let q = query(categoriesRef, orderBy('sort_order'));
+  let query = supabase
+    .from('categories')
+    .select('*')
+    .order('sort_order');
 
   if (activeOnly) {
-    q = query(categoriesRef, where('is_active', '==', true), orderBy('sort_order'));
+    query = query.eq('is_active', true);
   }
 
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  })) as Category[];
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching categories:', error);
+    throw error;
+  }
+
+  return data || [];
 }
 
 export async function getCategoryById(id: string) {
-  const categoryRef = doc(db, 'categories', id);
-  const categorySnap = await getDoc(categoryRef);
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('id', id)
+    .single();
 
-  if (!categorySnap.exists()) {
+  if (error) {
+    console.error('Error fetching category:', error);
     return null;
   }
 
-  return {
-    id: categorySnap.id,
-    ...categorySnap.data()
-  } as Category;
+  return data;
 }
 
 export async function createCategory(category: Partial<Category>) {
   const slug = generateSlug(category.name || '');
 
-  const newCategory = {
-    ...category,
-    slug,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
+  const { data, error } = await supabase
+    .from('categories')
+    .insert({
+      ...category,
+      slug
+    })
+    .select()
+    .single();
 
-  const docRef = await addDoc(collection(db, 'categories'), newCategory);
+  if (error) {
+    console.error('Error creating category:', error);
+    throw error;
+  }
 
-  return {
-    id: docRef.id,
-    ...newCategory
-  };
+  return data;
 }
 
 export async function updateCategory(id: string, category: Partial<Category>) {
-  const categoryRef = doc(db, 'categories', id);
+  const { data, error } = await supabase
+    .from('categories')
+    .update(category)
+    .eq('id', id)
+    .select()
+    .single();
 
-  const updateData = {
-    ...category,
-    updated_at: new Date().toISOString()
-  };
+  if (error) {
+    console.error('Error updating category:', error);
+    throw error;
+  }
 
-  await updateDoc(categoryRef, updateData);
-
-  return {
-    id,
-    ...updateData
-  };
+  return data;
 }
 
 export async function deleteCategory(id: string) {
-  const productCategoriesRef = collection(db, 'product_categories');
-  const productCategoriesQuery = query(productCategoriesRef, where('category_id', '==', id));
-  const productCategoriesSnapshot = await getDocs(productCategoriesQuery);
+  const { error: productCategoriesError } = await supabase
+    .from('product_categories')
+    .delete()
+    .eq('category_id', id);
 
-  for (const productCategoryDoc of productCategoriesSnapshot.docs) {
-    await deleteDoc(productCategoryDoc.ref);
+  if (productCategoriesError) {
+    console.error('Error deleting product categories:', productCategoriesError);
   }
 
-  const categoryRef = doc(db, 'categories', id);
-  await deleteDoc(categoryRef);
+  const { error } = await supabase
+    .from('categories')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting category:', error);
+    throw error;
+  }
 }
 
 export async function updateCategorySortOrder(categories: { id: string; sort_order: number }[]) {
   for (const category of categories) {
-    const categoryRef = doc(db, 'categories', category.id);
-    await updateDoc(categoryRef, {
-      sort_order: category.sort_order,
-      updated_at: new Date().toISOString()
-    });
+    await supabase
+      .from('categories')
+      .update({ sort_order: category.sort_order })
+      .eq('id', category.id);
   }
 }
 
 export async function getHeaderCategories() {
-  const categoriesRef = collection(db, 'categories');
-  const q = query(
-    categoriesRef,
-    where('show_in_header', '==', true),
-    where('is_active', '==', true),
-    orderBy('sort_order')
-  );
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('show_in_header', true)
+    .eq('is_active', true)
+    .order('sort_order');
 
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  })) as Category[];
+  if (error) {
+    console.error('Error fetching header categories:', error);
+    throw error;
+  }
+
+  return data || [];
 }
 
 export async function toggleCategoryPublished(id: string, isPublished: boolean) {
-  const categoryRef = doc(db, 'categories', id);
+  const { data, error } = await supabase
+    .from('categories')
+    .update({ is_published: isPublished })
+    .eq('id', id)
+    .select()
+    .single();
 
-  await updateDoc(categoryRef, {
-    is_published: isPublished,
-    updated_at: new Date().toISOString()
-  });
+  if (error) {
+    console.error('Error toggling category published:', error);
+    throw error;
+  }
 
-  const categorySnap = await getDoc(categoryRef);
-  return {
-    id: categorySnap.id,
-    ...categorySnap.data()
-  };
+  return data;
 }
 
 export async function uploadCategoryIcon(file: File): Promise<string> {
@@ -162,12 +167,13 @@ export async function uploadCategoryIcon(file: File): Promise<string> {
 
 export async function updateCategoriesOrder(categories: Array<{ id: string; sort_order: number; parent_id?: string | null }>) {
   for (const cat of categories) {
-    const categoryRef = doc(db, 'categories', cat.id);
-    await updateDoc(categoryRef, {
-      sort_order: cat.sort_order,
-      parent_id: cat.parent_id || null,
-      updated_at: new Date().toISOString()
-    });
+    await supabase
+      .from('categories')
+      .update({
+        sort_order: cat.sort_order,
+        parent_id: cat.parent_id || null
+      })
+      .eq('id', cat.id);
   }
 }
 

@@ -1,88 +1,88 @@
-import {
-  collection,
-  doc,
-  getDocs,
-  getDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  orderBy
-} from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { db, storage } from '../firebase';
+import { storage } from '../firebase';
+import { supabase } from '../supabase';
 
 export interface Banner {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   image_url: string;
+  mobile_image_url?: string;
   link_url?: string;
+  category_id?: string;
+  placement: string;
   sort_order: number;
   is_active: boolean;
+  start_date?: string;
+  end_date?: string;
   created_at: string;
   updated_at: string;
 }
 
 export async function getBanners(activeOnly: boolean = false) {
-  const bannersRef = collection(db, 'banners');
-  let q = query(bannersRef, orderBy('sort_order'));
+  let query = supabase
+    .from('banners')
+    .select('*')
+    .order('sort_order');
 
   if (activeOnly) {
-    q = query(bannersRef, where('is_active', '==', true), orderBy('sort_order'));
+    query = query.eq('is_active', true);
   }
 
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  })) as Banner[];
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching banners:', error);
+    throw error;
+  }
+
+  return data || [];
 }
 
 export async function getBannerById(id: string) {
-  const bannerRef = doc(db, 'banners', id);
-  const bannerSnap = await getDoc(bannerRef);
+  const { data, error } = await supabase
+    .from('banners')
+    .select('*')
+    .eq('id', id)
+    .single();
 
-  if (!bannerSnap.exists()) {
+  if (error) {
+    console.error('Error fetching banner:', error);
     return null;
   }
 
-  return {
-    id: bannerSnap.id,
-    ...bannerSnap.data()
-  } as Banner;
+  return data;
 }
 
 export async function createBanner(banner: Partial<Banner>) {
-  const newBanner = {
-    ...banner,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
+  const { data, error } = await supabase
+    .from('banners')
+    .insert(banner)
+    .select()
+    .single();
 
-  const docRef = await addDoc(collection(db, 'banners'), newBanner);
+  if (error) {
+    console.error('Error creating banner:', error);
+    throw error;
+  }
 
-  return {
-    id: docRef.id,
-    ...newBanner
-  };
+  return data;
 }
 
 export async function updateBanner(id: string, banner: Partial<Banner>) {
-  const bannerRef = doc(db, 'banners', id);
+  const { data, error } = await supabase
+    .from('banners')
+    .update(banner)
+    .eq('id', id)
+    .select()
+    .single();
 
-  const updateData = {
-    ...banner,
-    updated_at: new Date().toISOString()
-  };
+  if (error) {
+    console.error('Error updating banner:', error);
+    throw error;
+  }
 
-  await updateDoc(bannerRef, updateData);
-
-  return {
-    id,
-    ...updateData
-  };
+  return data;
 }
 
 export async function deleteBanner(id: string) {
@@ -94,12 +94,29 @@ export async function deleteBanner(id: string) {
       const imageStorageRef = ref(storage, imagePath);
       await deleteObject(imageStorageRef);
     } catch (error) {
-      console.error('Error deleting banner image from storage:', error);
+      console.error('Error deleting banner image from Firebase storage:', error);
     }
   }
 
-  const bannerRef = doc(db, 'banners', id);
-  await deleteDoc(bannerRef);
+  if (banner?.mobile_image_url && banner.mobile_image_url.includes('firebase')) {
+    try {
+      const imagePath = decodeURIComponent(banner.mobile_image_url.split('/o/')[1].split('?')[0]);
+      const imageStorageRef = ref(storage, imagePath);
+      await deleteObject(imageStorageRef);
+    } catch (error) {
+      console.error('Error deleting mobile banner image from Firebase storage:', error);
+    }
+  }
+
+  const { error } = await supabase
+    .from('banners')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting banner:', error);
+    throw error;
+  }
 }
 
 export async function uploadBannerImage(file: File): Promise<string> {
@@ -115,27 +132,27 @@ export async function uploadBannerImage(file: File): Promise<string> {
 
 export async function updateBannerSortOrder(banners: { id: string; sort_order: number }[]) {
   for (const banner of banners) {
-    const bannerRef = doc(db, 'banners', banner.id);
-    await updateDoc(bannerRef, {
-      sort_order: banner.sort_order,
-      updated_at: new Date().toISOString()
-    });
+    await supabase
+      .from('banners')
+      .update({ sort_order: banner.sort_order })
+      .eq('id', banner.id);
   }
 }
 
 export async function toggleBannerActive(id: string, isActive: boolean) {
-  const bannerRef = doc(db, 'banners', id);
+  const { data, error } = await supabase
+    .from('banners')
+    .update({ is_active: isActive })
+    .eq('id', id)
+    .select()
+    .single();
 
-  await updateDoc(bannerRef, {
-    is_active: isActive,
-    updated_at: new Date().toISOString()
-  });
+  if (error) {
+    console.error('Error toggling banner active:', error);
+    throw error;
+  }
 
-  const bannerSnap = await getDoc(bannerRef);
-  return {
-    id: bannerSnap.id,
-    ...bannerSnap.data()
-  };
+  return data;
 }
 
 export async function updateBannersOrder(banners: { id: string; sort_order: number }[]) {
