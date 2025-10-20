@@ -6,7 +6,7 @@ import {
   deleteProduct,
   toggleProductPublished,
   Product,
-} from '../../lib/products';
+} from '../../lib/firestore/products';
 import {
   Plus,
   Search,

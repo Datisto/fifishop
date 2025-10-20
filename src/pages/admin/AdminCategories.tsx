@@ -8,7 +8,7 @@ import {
   buildCategoryTree,
   Category,
   CategoryTreeNode,
-} from '../../lib/categories';
+} from '../../lib/firestore/categories';
 import {
   Plus,
   Edit,

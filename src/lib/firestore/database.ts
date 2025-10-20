@@ -1,4 +1,5 @@
-import { supabase } from './supabase';
+import { collection, getDocs, addDoc, deleteDoc, query, where } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export interface DatabaseBackup {
   version: string;
@@ -15,7 +16,7 @@ export interface DatabaseBackup {
   };
 }
 
-const TABLES_TO_BACKUP = [
+const COLLECTIONS_TO_BACKUP = [
   'categories',
   'products',
   'product_categories',
@@ -42,15 +43,21 @@ export async function exportDatabase(): Promise<DatabaseBackup> {
     },
   };
 
-  for (const table of TABLES_TO_BACKUP) {
-    const { data, error } = await supabase.from(table).select('*');
+  for (const collectionName of COLLECTIONS_TO_BACKUP) {
+    try {
+      const collectionRef = collection(db, collectionName);
+      const snapshot = await getDocs(collectionRef);
 
-    if (error) {
-      console.error(`Error exporting ${table}:`, error);
-      throw new Error(`Failed to export ${table}: ${error.message}`);
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      backup.tables[collectionName as keyof typeof backup.tables] = data;
+    } catch (error) {
+      console.error(`Error exporting ${collectionName}:`, error);
+      throw new Error(`Failed to export ${collectionName}`);
     }
-
-    backup.tables[table as keyof typeof backup.tables] = data || [];
   }
 
   return backup;
@@ -61,7 +68,7 @@ export async function importDatabase(backup: DatabaseBackup): Promise<void> {
     throw new Error('Unsupported backup version');
   }
 
-  const orderedTables = [
+  const orderedCollections = [
     'categories',
     'products',
     'product_categories',
@@ -72,28 +79,28 @@ export async function importDatabase(backup: DatabaseBackup): Promise<void> {
     'order_items',
   ];
 
-  for (const table of orderedTables) {
-    const data = backup.tables[table as keyof typeof backup.tables];
+  for (const collectionName of orderedCollections) {
+    const data = backup.tables[collectionName as keyof typeof backup.tables];
 
     if (!data || data.length === 0) {
       continue;
     }
 
-    const { error: deleteError } = await supabase
-      .from(table)
-      .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000');
+    try {
+      const collectionRef = collection(db, collectionName);
+      const snapshot = await getDocs(collectionRef);
 
-    if (deleteError) {
-      console.error(`Error clearing ${table}:`, deleteError);
-      throw new Error(`Failed to clear ${table}: ${deleteError.message}`);
-    }
+      for (const doc of snapshot.docs) {
+        await deleteDoc(doc.ref);
+      }
 
-    const { error: insertError } = await supabase.from(table).insert(data);
-
-    if (insertError) {
-      console.error(`Error importing ${table}:`, insertError);
-      throw new Error(`Failed to import ${table}: ${insertError.message}`);
+      for (const item of data) {
+        const { id, ...itemData } = item;
+        await addDoc(collectionRef, itemData);
+      }
+    } catch (error) {
+      console.error(`Error importing ${collectionName}:`, error);
+      throw new Error(`Failed to import ${collectionName}`);
     }
   }
 }

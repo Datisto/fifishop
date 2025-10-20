@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { getBanners, Banner } from '../lib/banners';
+import { getBanners, Banner } from '../lib/firestore/banners';
 
 interface HeroProps {
   onCategorySelect?: (category: string) => void;
@@ -17,7 +17,7 @@ const Hero = ({ onCategorySelect }: HeroProps) => {
 
   const loadBanners = async () => {
     try {
-      const data = await getBanners('home', true);
+      const data = await getBanners(true);
       if (data && data.length > 0) {
         setBanners(data);
       } else {

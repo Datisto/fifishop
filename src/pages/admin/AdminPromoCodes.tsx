@@ -7,7 +7,7 @@ import {
   togglePromoCodeActive,
   getPromoCodeStats,
   PromoCode,
-} from '../../lib/promoCodes';
+} from '../../lib/firestore/promoCodes';
 import { Plus, Edit, Trash2, Search, Power } from 'lucide-react';
 
 export default function AdminPromoCodes() {

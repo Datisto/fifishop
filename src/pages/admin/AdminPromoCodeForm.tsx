@@ -5,10 +5,9 @@ import {
   createPromoCode,
   updatePromoCode,
   getPromoCodeById,
-  getPromoCodeUsageHistory,
-} from '../../lib/promoCodes';
-import { getCategories, Category } from '../../lib/categories';
-import { getProducts } from '../../lib/products';
+} from '../../lib/firestore/promoCodes';
+import { getCategories, Category } from '../../lib/firestore/categories';
+import { getProducts } from '../../lib/firestore/products';
 import { Save, ArrowLeft, History } from 'lucide-react';
 
 export default function AdminPromoCodeForm() {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { getCategories, Category } from '../lib/categories';
+import { getCategories, Category } from '../lib/firestore/categories';
 
 interface PromotionalTilesProps {
   onCategorySelect: (category: string) => void;

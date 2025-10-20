@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
-import { Product } from '../lib/products';
+import { Product } from '../lib/firestore/products';
 import { useCart } from '../contexts/CartContext';
 
 interface ProductCardProps {

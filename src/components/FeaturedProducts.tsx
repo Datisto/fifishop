@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import ProductCard from './ProductCard';
-import { supabase } from '../lib/supabase';
+import { collection, query, where, orderBy as firestoreOrderBy, getDocs } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 interface FeaturedProductsProps {
   selectedCategory: string | null;
@@ -44,38 +45,60 @@ const FeaturedProducts = ({ selectedCategory, searchQuery }: FeaturedProductsPro
 
   const loadProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          id,
-          name,
-          description,
-          price,
-          discount_price,
-          main_image_url,
-          sku,
-          stock_quantity,
-          product_images (
-            image_url,
-            sort_order
-          ),
-          product_categories (
-            categories (
-              name
-            )
-          )
-        `)
-        .eq('is_published', true)
-        .order('created_at', { ascending: false });
+      const productsRef = collection(db, 'products');
+      const q = query(
+        productsRef,
+        where('is_published', '==', true),
+        firestoreOrderBy('created_at', 'desc')
+      );
 
-      if (error) throw error;
+      const snapshot = await getDocs(q);
+      const productsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Product[];
 
-      const productsWithSortedImages = (data || []).map(product => ({
-        ...product,
-        product_images: product.product_images?.sort((a, b) => a.sort_order - b.sort_order)
-      }));
+      const productsWithDetails = await Promise.all(
+        productsData.map(async (product) => {
+          const imagesRef = collection(db, 'product_images');
+          const imagesQuery = query(
+            imagesRef,
+            where('product_id', '==', product.id),
+            firestoreOrderBy('sort_order')
+          );
+          const imagesSnapshot = await getDocs(imagesQuery);
+          const product_images = imagesSnapshot.docs.map(doc => doc.data());
 
-      setProducts(productsWithSortedImages);
+          const categoriesRef = collection(db, 'product_categories');
+          const categoriesQuery = query(categoriesRef, where('product_id', '==', product.id));
+          const categoriesSnapshot = await getDocs(categoriesQuery);
+
+          const product_categories = await Promise.all(
+            categoriesSnapshot.docs.map(async (catDoc) => {
+              const categoryId = catDoc.data().category_id;
+              const categoryRef = collection(db, 'categories');
+              const categorySnapshot = await getDocs(query(categoryRef, where('__name__', '==', categoryId)));
+              if (!categorySnapshot.empty) {
+                const categoryData = categorySnapshot.docs[0].data();
+                return {
+                  categories: {
+                    name: categoryData.name
+                  }
+                };
+              }
+              return null;
+            })
+          );
+
+          return {
+            ...product,
+            product_images,
+            product_categories: product_categories.filter(Boolean)
+          };
+        })
+      );
+
+      setProducts(productsWithDetails);
     } catch (error) {
       console.error('Error loading products:', error);
     } finally {

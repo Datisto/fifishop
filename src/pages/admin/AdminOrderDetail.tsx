@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Package, User, MapPin, MessageSquare, Tag, AlertCircle } from 'lucide-react';
-import { getOrderById, updateOrderStatus } from '../../lib/orders';
+import { getOrderById, updateOrderStatus } from '../../lib/firestore/orders';
 import AdminLayout from '../../components/admin/AdminLayout';
 
 export default function AdminOrderDetail() {
