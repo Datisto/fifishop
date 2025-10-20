@@ -27,7 +27,7 @@ export default function AdminBannerForm() {
     link_url: '',
     placement: 'home',
     category_id: '',
-    link_type: 'url' as 'url' | 'category',
+    link_type: 'none' as 'none' | 'url' | 'category',
     is_active: true,
     sort_order: 0,
     start_date: '',
@@ -55,6 +55,13 @@ export default function AdminBannerForm() {
       setLoading(true);
       const banner = await getBannerById(id!);
       if (banner) {
+        let linkType: 'none' | 'url' | 'category' = 'none';
+        if (banner.category_id) {
+          linkType = 'category';
+        } else if (banner.link_url) {
+          linkType = 'url';
+        }
+
         setFormData({
           title: banner.title,
           image_url: banner.image_url,
@@ -62,7 +69,7 @@ export default function AdminBannerForm() {
           link_url: banner.link_url || '',
           placement: banner.placement,
           category_id: banner.category_id || '',
-          link_type: banner.category_id ? 'category' : 'url',
+          link_type: linkType,
           is_active: banner.is_active,
           sort_order: banner.sort_order,
           start_date: banner.start_date ? banner.start_date.split('T')[0] : '',
@@ -228,9 +235,23 @@ export default function AdminBannerForm() {
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Тип посилання
+                  Кнопка дії (опціонально)
                 </label>
+                <p className="text-sm text-slate-500 mb-4">
+                  Якщо не вибрано жодного варіанту, кнопка не буде відображатися
+                </p>
                 <div className="flex gap-4 mb-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="link_type"
+                      value="none"
+                      checked={formData.link_type === 'none'}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <span className="text-sm text-slate-700">Без кнопки</span>
+                  </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
@@ -255,21 +276,23 @@ export default function AdminBannerForm() {
                   </label>
                 </div>
 
-                {formData.link_type === 'url' ? (
+                {formData.link_type === 'url' && (
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Посилання (URL) <span className="text-slate-500 font-normal">(необов'язково)</span>
+                      Посилання (URL)
                     </label>
                     <input
                       type="text"
                       name="link_url"
                       value={formData.link_url}
                       onChange={handleChange}
-                      placeholder="https://example.com або залиште пустим для інформаційного банера"
+                      placeholder="https://example.com"
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
-                ) : (
+                )}
+
+                {formData.link_type === 'category' && (
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
                       Виберіть категорію
@@ -278,7 +301,6 @@ export default function AdminBannerForm() {
                       name="category_id"
                       value={formData.category_id}
                       onChange={handleChange}
-                      required
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">Оберіть категорію...</option>
