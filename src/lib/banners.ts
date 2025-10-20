@@ -8,6 +8,7 @@ export interface Banner {
   link_url: string | null;
   placement: 'home' | 'category' | 'promo';
   category_id: string | null;
+  category_name?: string | null;
   is_active: boolean;
   sort_order: number;
   start_date: string | null;
@@ -19,7 +20,12 @@ export interface Banner {
 export async function getBanners(placement?: string, isActive?: boolean) {
   let query = supabase
     .from('banners')
-    .select('*')
+    .select(`
+      *,
+      categories:category_id (
+        name
+      )
+    `)
     .order('sort_order', { ascending: true })
     .order('created_at', { ascending: false });
 
@@ -34,7 +40,12 @@ export async function getBanners(placement?: string, isActive?: boolean) {
   const { data, error } = await query;
 
   if (error) throw error;
-  return data;
+
+  return data?.map(banner => ({
+    ...banner,
+    category_name: banner.categories?.name || null,
+    categories: undefined
+  })) as Banner[];
 }
 
 export async function getBannerById(id: string) {

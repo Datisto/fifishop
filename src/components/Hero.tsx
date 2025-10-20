@@ -93,10 +93,10 @@ const Hero = ({ onCategorySelect }: HeroProps) => {
                 </h2>
 
                 {(banner.link_url || banner.category_id) && (
-                  banner.category_id ? (
+                  banner.category_id && banner.category_name ? (
                     <button
                       onClick={() => {
-                        onCategorySelect?.(banner.category_id!);
+                        onCategorySelect?.(banner.category_name!.toUpperCase());
                         const productsSection = document.querySelector('[data-products-section]');
                         if (productsSection) {
                           productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
