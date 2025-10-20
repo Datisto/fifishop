@@ -1,4 +1,17 @@
-import { supabase } from '../supabase';
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  increment
+} from 'firebase/firestore';
+import { db } from '../firebase';
 
 export interface PromoCode {
   id: string;
@@ -18,47 +31,44 @@ export interface PromoCode {
 }
 
 export async function getPromoCodes() {
-  const { data, error } = await supabase
-    .from('promo_codes')
-    .select('*')
-    .order('created_at', { ascending: false });
+  const promoCodesRef = collection(db, 'promo_codes');
+  const q = query(promoCodesRef, orderBy('created_at', 'desc'));
 
-  if (error) {
-    console.error('Error fetching promo codes:', error);
-    throw error;
-  }
-
-  return data || [];
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  })) as PromoCode[];
 }
 
 export async function getPromoCodeById(id: string) {
-  const { data, error } = await supabase
-    .from('promo_codes')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const promoCodeRef = doc(db, 'promo_codes', id);
+  const promoCodeSnap = await getDoc(promoCodeRef);
 
-  if (error) {
-    console.error('Error fetching promo code:', error);
+  if (!promoCodeSnap.exists()) {
     return null;
   }
 
-  return data;
+  return {
+    id: promoCodeSnap.id,
+    ...promoCodeSnap.data()
+  } as PromoCode;
 }
 
 export async function getPromoCodeByCode(code: string) {
-  const { data, error } = await supabase
-    .from('promo_codes')
-    .select('*')
-    .eq('code', code.toUpperCase())
-    .maybeSingle();
+  const promoCodesRef = collection(db, 'promo_codes');
+  const q = query(promoCodesRef, where('code', '==', code.toUpperCase()));
 
-  if (error) {
-    console.error('Error fetching promo code by code:', error);
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
     return null;
   }
 
-  return data;
+  return {
+    id: snapshot.docs[0].id,
+    ...snapshot.docs[0].data()
+  } as PromoCode;
 }
 
 export async function validatePromoCode(code: string, orderAmount: number) {
@@ -122,25 +132,25 @@ export async function createPromoCode(promoCode: Partial<PromoCode>) {
     throw new Error('Промокод з таким кодом вже існує');
   }
 
-  const { data, error } = await supabase
-    .from('promo_codes')
-    .insert({
-      ...promoCode,
-      code,
-      used_count: 0
-    })
-    .select()
-    .single();
+  const newPromoCode = {
+    ...promoCode,
+    code,
+    used_count: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
 
-  if (error) {
-    console.error('Error creating promo code:', error);
-    throw error;
-  }
+  const docRef = await addDoc(collection(db, 'promo_codes'), newPromoCode);
 
-  return data;
+  return {
+    id: docRef.id,
+    ...newPromoCode
+  };
 }
 
 export async function updatePromoCode(id: string, promoCode: Partial<PromoCode>) {
+  const promoCodeRef = doc(db, 'promo_codes', id);
+
   if (promoCode.code) {
     const code = promoCode.code.toUpperCase();
     const existing = await getPromoCodeByCode(code);
@@ -150,31 +160,22 @@ export async function updatePromoCode(id: string, promoCode: Partial<PromoCode>)
     promoCode.code = code;
   }
 
-  const { data, error } = await supabase
-    .from('promo_codes')
-    .update(promoCode)
-    .eq('id', id)
-    .select()
-    .single();
+  const updateData = {
+    ...promoCode,
+    updated_at: new Date().toISOString()
+  };
 
-  if (error) {
-    console.error('Error updating promo code:', error);
-    throw error;
-  }
+  await updateDoc(promoCodeRef, updateData);
 
-  return data;
+  return {
+    id,
+    ...updateData
+  };
 }
 
 export async function deletePromoCode(id: string) {
-  const { error } = await supabase
-    .from('promo_codes')
-    .delete()
-    .eq('id', id);
-
-  if (error) {
-    console.error('Error deleting promo code:', error);
-    throw error;
-  }
+  const promoCodeRef = doc(db, 'promo_codes', id);
+  await deleteDoc(promoCodeRef);
 }
 
 export async function incrementPromoCodeUsage(code: string) {
@@ -184,43 +185,35 @@ export async function incrementPromoCodeUsage(code: string) {
     throw new Error('Промокод не знайдено');
   }
 
-  const { error } = await supabase.rpc('increment_promo_code_usage', {
-    promo_code_id: promoCode.id
+  const promoCodeRef = doc(db, 'promo_codes', promoCode.id);
+  await updateDoc(promoCodeRef, {
+    used_count: increment(1),
+    updated_at: new Date().toISOString()
   });
-
-  if (error) {
-    console.error('Error incrementing promo code usage:', error);
-    throw error;
-  }
 }
 
 export async function togglePromoCodeActive(id: string, isActive: boolean) {
-  const { data, error } = await supabase
-    .from('promo_codes')
-    .update({ is_active: isActive })
-    .eq('id', id)
-    .select()
-    .single();
+  const promoCodeRef = doc(db, 'promo_codes', id);
 
-  if (error) {
-    console.error('Error toggling promo code active:', error);
-    throw error;
-  }
+  await updateDoc(promoCodeRef, {
+    is_active: isActive,
+    updated_at: new Date().toISOString()
+  });
 
-  return data;
+  const promoCodeSnap = await getDoc(promoCodeRef);
+  return {
+    id: promoCodeSnap.id,
+    ...promoCodeSnap.data()
+  };
 }
 
 export async function getPromoCodeStats() {
-  const { data, error } = await supabase
-    .from('promo_codes')
-    .select('*');
-
-  if (error) {
-    console.error('Error fetching promo code stats:', error);
-    throw error;
-  }
-
-  const promoCodes = data || [];
+  const promoCodesRef = collection(db, 'promo_codes');
+  const snapshot = await getDocs(promoCodesRef);
+  const promoCodes = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  })) as PromoCode[];
 
   const stats = {
     total: promoCodes.length,

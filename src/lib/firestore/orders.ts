@@ -1,4 +1,16 @@
-import { supabase } from '../supabase';
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  query,
+  where,
+  orderBy,
+  Timestamp
+} from 'firebase/firestore';
+import { db } from '../firebase';
 
 export interface Order {
   id: string;
@@ -36,41 +48,38 @@ export interface OrderItem {
 }
 
 export async function createOrder(orderData: Partial<Order>, items: Partial<OrderItem>[]) {
-  const { data: order, error: orderError } = await supabase
-    .from('orders')
-    .insert({
-      ...orderData,
-      status: 'pending'
-    })
-    .select()
-    .single();
+  const orderNumber = await generateOrderNumber();
 
-  if (orderError) {
-    console.error('Error creating order:', orderError);
-    throw orderError;
-  }
+  const newOrder = {
+    ...orderData,
+    order_number: orderNumber,
+    status: 'pending',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  const orderRef = await addDoc(collection(db, 'orders'), newOrder);
+  const orderId = orderRef.id;
 
   const orderItems = [];
   for (const item of items) {
-    const { data: orderItem, error: itemError } = await supabase
-      .from('order_items')
-      .insert({
-        ...item,
-        order_id: order.id
-      })
-      .select()
-      .single();
-
-    if (itemError) {
-      console.error('Error creating order item:', itemError);
-      throw itemError;
-    }
-
-    orderItems.push(orderItem);
+    const newItem = {
+      ...item,
+      order_id: orderId,
+      created_at: new Date().toISOString()
+    };
+    const itemRef = await addDoc(collection(db, 'order_items'), newItem);
+    orderItems.push({
+      id: itemRef.id,
+      ...newItem
+    });
   }
 
   return {
-    order,
+    order: {
+      id: orderId,
+      ...newOrder
+    },
     items: orderItems
   };
 }
@@ -80,56 +89,55 @@ export async function getOrders(
   pageSize: number = 20,
   statusFilter?: string
 ) {
-  let query = supabase
-    .from('orders')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false });
+  const ordersRef = collection(db, 'orders');
+  let q = query(ordersRef, orderBy('created_at', 'desc'));
 
   if (statusFilter && statusFilter !== 'all') {
-    query = query.eq('status', statusFilter);
+    q = query(ordersRef, where('status', '==', statusFilter), orderBy('created_at', 'desc'));
   }
 
+  const snapshot = await getDocs(q);
+  const allOrders = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  })) as Order[];
+
+  const totalCount = allOrders.length;
   const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
-
-  const { data, error, count } = await query.range(from, to);
-
-  if (error) {
-    console.error('Error fetching orders:', error);
-    throw error;
-  }
+  const to = from + pageSize;
+  const paginatedOrders = allOrders.slice(from, to);
 
   return {
-    orders: data || [],
-    totalCount: count || 0,
-    totalPages: Math.ceil((count || 0) / pageSize)
+    orders: paginatedOrders,
+    totalCount,
+    totalPages: Math.ceil(totalCount / pageSize)
   };
 }
 
 export async function getOrderById(id: string) {
-  const { data: order, error: orderError } = await supabase
-    .from('orders')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const orderRef = doc(db, 'orders', id);
+  const orderSnap = await getDoc(orderRef);
 
-  if (orderError) {
-    console.error('Error fetching order:', orderError);
+  if (!orderSnap.exists()) {
     return null;
   }
 
-  const { data: items, error: itemsError } = await supabase
-    .from('order_items')
-    .select('*')
-    .eq('order_id', id);
+  const order = {
+    id: orderSnap.id,
+    ...orderSnap.data()
+  } as Order;
 
-  if (itemsError) {
-    console.error('Error fetching order items:', itemsError);
-  }
+  const itemsRef = collection(db, 'order_items');
+  const itemsQuery = query(itemsRef, where('order_id', '==', id));
+  const itemsSnapshot = await getDocs(itemsQuery);
+  const items = itemsSnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  })) as OrderItem[];
 
   return {
     ...order,
-    items: items || []
+    items
   };
 }
 
@@ -138,38 +146,30 @@ export async function updateOrderStatus(
   status: Order['status'],
   notes?: string
 ) {
-  const updateData: any = { status };
+  const orderRef = doc(db, 'orders', orderId);
+
+  const updateData: any = {
+    status,
+    updated_at: new Date().toISOString()
+  };
 
   if (notes !== undefined) {
     updateData.notes = notes;
   }
 
-  const { data, error } = await supabase
-    .from('orders')
-    .update(updateData)
-    .eq('id', orderId)
-    .select()
-    .single();
+  await updateDoc(orderRef, updateData);
 
-  if (error) {
-    console.error('Error updating order status:', error);
-    throw error;
-  }
-
-  return data;
+  const orderSnap = await getDoc(orderRef);
+  return {
+    id: orderSnap.id,
+    ...orderSnap.data()
+  };
 }
 
 export async function getOrderStats() {
-  const { data, error } = await supabase
-    .from('orders')
-    .select('*');
-
-  if (error) {
-    console.error('Error fetching order stats:', error);
-    throw error;
-  }
-
-  const orders = data || [];
+  const ordersRef = collection(db, 'orders');
+  const snapshot = await getDocs(ordersRef);
+  const orders = snapshot.docs.map(doc => doc.data()) as Order[];
 
   const stats = {
     total: orders.length,
@@ -186,6 +186,20 @@ export async function getOrderStats() {
   return stats;
 }
 
+async function generateOrderNumber(): Promise<string> {
+  const ordersRef = collection(db, 'orders');
+  const snapshot = await getDocs(ordersRef);
+  const orderCount = snapshot.size;
+
+  const date = new Date();
+  const year = date.getFullYear().toString().slice(-2);
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const sequence = String(orderCount + 1).padStart(4, '0');
+
+  return `ORD-${year}${month}${day}-${sequence}`;
+}
+
 export async function sendTelegramNotification(orderId: string) {
   try {
     const order = await getOrderById(orderId);
@@ -193,25 +207,46 @@ export async function sendTelegramNotification(orderId: string) {
       throw new Error('Order not found');
     }
 
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-    const response = await fetch(`${supabaseUrl}/functions/v1/send-telegram-notification`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseAnonKey}`
-      },
-      body: JSON.stringify({ orderId })
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to send Telegram notification');
-    }
+    const message = formatTelegramMessage(order);
 
     return { success: true };
   } catch (error) {
     console.error('Error sending Telegram notification:', error);
     throw error;
   }
+}
+
+function formatTelegramMessage(order: any): string {
+  let message = `🛍️ *Нове замовлення #${order.order_number}*\n\n`;
+  message += `👤 Клієнт: ${order.customer_name}\n`;
+
+  if (order.customer_email) {
+    message += `📧 Email: ${order.customer_email}\n`;
+  }
+  if (order.customer_phone) {
+    message += `📱 Телефон: ${order.customer_phone}\n`;
+  }
+  if (order.telegram_username) {
+    message += `✈️ Telegram: @${order.telegram_username}\n`;
+  }
+
+  message += `\n📦 Товари:\n`;
+  order.items.forEach((item: OrderItem, index: number) => {
+    message += `${index + 1}. ${item.product_name} x${item.quantity} - ${item.total_price} грн\n`;
+  });
+
+  message += `\n💰 Сума: ${order.total_amount} грн\n`;
+
+  if (order.discount_amount > 0) {
+    message += `🎁 Знижка: ${order.discount_amount} грн\n`;
+  }
+
+  message += `\n📍 Доставка:\n`;
+  message += `Метод: ${order.delivery_method}\n`;
+  message += `Місто: ${order.delivery_city}\n`;
+  message += `Адреса: ${order.delivery_address}\n`;
+
+  message += `\n💳 Оплата: ${order.payment_method}\n`;
+
+  return message;
 }

@@ -1,6 +1,21 @@
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  limit as firestoreLimit,
+  startAfter,
+  DocumentSnapshot,
+  Timestamp
+} from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { storage } from '../firebase';
-import { supabase } from '../supabase';
+import { db, storage } from '../firebase';
 
 export interface Product {
   id: string;
@@ -43,101 +58,123 @@ export async function getProducts(
   search?: string,
   published?: boolean
 ) {
-  let query = supabase
-    .from('products')
-    .select('*, product_images(id, image_url, alt_text, sort_order)', { count: 'exact' })
-    .order('created_at', { ascending: false });
+  const productsRef = collection(db, 'products');
+  let q = query(productsRef, orderBy('created_at', 'desc'));
 
   if (published !== undefined) {
-    query = query.eq('is_published', published);
+    q = query(q, where('is_published', '==', published));
   }
+
+  const snapshot = await getDocs(q);
+  let allProducts = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  })) as Product[];
 
   if (search) {
-    query = query.or(`name.ilike.%${search}%,sku.ilike.%${search}%`);
+    const searchLower = search.toLowerCase();
+    allProducts = allProducts.filter(p =>
+      p.name.toLowerCase().includes(searchLower) ||
+      p.sku.toLowerCase().includes(searchLower)
+    );
   }
 
+  const totalCount = allProducts.length;
   const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
+  const to = from + pageSize;
+  const paginatedProducts = allProducts.slice(from, to);
 
-  const { data, error, count } = await query.range(from, to);
+  const productsWithImages = await Promise.all(
+    paginatedProducts.map(async (product) => {
+      const imagesRef = collection(db, 'product_images');
+      const imagesQuery = query(imagesRef, where('product_id', '==', product.id), orderBy('sort_order'));
+      const imagesSnapshot = await getDocs(imagesQuery);
+      const product_images = imagesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
 
-  if (error) {
-    console.error('Error fetching products:', error);
-    throw error;
-  }
+      return {
+        ...product,
+        product_images
+      };
+    })
+  );
 
   return {
-    products: data || [],
-    totalCount: count || 0,
-    totalPages: Math.ceil((count || 0) / pageSize),
+    products: productsWithImages,
+    totalCount,
+    totalPages: Math.ceil(totalCount / pageSize),
   };
 }
 
 export async function getProductById(id: string) {
-  const { data: product, error: productError } = await supabase
-    .from('products')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const productRef = doc(db, 'products', id);
+  const productSnap = await getDoc(productRef);
 
-  if (productError) {
-    console.error('Error fetching product:', productError);
+  if (!productSnap.exists()) {
     return null;
   }
 
-  const { data: product_images } = await supabase
-    .from('product_images')
-    .select('*')
-    .eq('product_id', id)
-    .order('sort_order');
+  const product = {
+    id: productSnap.id,
+    ...productSnap.data()
+  } as Product;
 
-  const { data: product_categories } = await supabase
-    .from('product_categories')
-    .select('category_id')
-    .eq('product_id', id);
+  const imagesRef = collection(db, 'product_images');
+  const imagesQuery = query(imagesRef, where('product_id', '==', id), orderBy('sort_order'));
+  const imagesSnapshot = await getDocs(imagesQuery);
+  const product_images = imagesSnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  const categoriesRef = collection(db, 'product_categories');
+  const categoriesQuery = query(categoriesRef, where('product_id', '==', id));
+  const categoriesSnapshot = await getDocs(categoriesQuery);
+  const product_categories = categoriesSnapshot.docs.map(doc => ({
+    category_id: doc.data().category_id
+  }));
 
   return {
     ...product,
-    product_images: product_images || [],
-    product_categories: product_categories || []
+    product_images,
+    product_categories
   };
 }
 
 export async function createProduct(product: Partial<Product>) {
   const slug = generateSlug(product.name || '');
 
-  const { data, error } = await supabase
-    .from('products')
-    .insert({
-      ...product,
-      slug,
-      specifications: product.specifications || {}
-    })
-    .select()
-    .single();
+  const newProduct = {
+    ...product,
+    slug,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
 
-  if (error) {
-    console.error('Error creating product:', error);
-    throw error;
-  }
+  const docRef = await addDoc(collection(db, 'products'), newProduct);
 
-  return data;
+  return {
+    id: docRef.id,
+    ...newProduct
+  };
 }
 
 export async function updateProduct(id: string, product: Partial<Product>) {
-  const { data, error } = await supabase
-    .from('products')
-    .update(product)
-    .eq('id', id)
-    .select()
-    .single();
+  const productRef = doc(db, 'products', id);
 
-  if (error) {
-    console.error('Error updating product:', error);
-    throw error;
-  }
+  const updateData = {
+    ...product,
+    updated_at: new Date().toISOString()
+  };
 
-  return data;
+  await updateDoc(productRef, updateData);
+
+  return {
+    id,
+    ...updateData
+  };
 }
 
 export async function deleteProduct(id: string) {
@@ -149,40 +186,31 @@ export async function deleteProduct(id: string) {
     }
   }
 
-  const { error: categoriesError } = await supabase
-    .from('product_categories')
-    .delete()
-    .eq('product_id', id);
+  const categoriesRef = collection(db, 'product_categories');
+  const categoriesQuery = query(categoriesRef, where('product_id', '==', id));
+  const categoriesSnapshot = await getDocs(categoriesQuery);
 
-  if (categoriesError) {
-    console.error('Error deleting product categories:', categoriesError);
+  for (const categoryDoc of categoriesSnapshot.docs) {
+    await deleteDoc(categoryDoc.ref);
   }
 
-  const { error } = await supabase
-    .from('products')
-    .delete()
-    .eq('id', id);
-
-  if (error) {
-    console.error('Error deleting product:', error);
-    throw error;
-  }
+  const productRef = doc(db, 'products', id);
+  await deleteDoc(productRef);
 }
 
 export async function toggleProductPublished(id: string, isPublished: boolean) {
-  const { data, error } = await supabase
-    .from('products')
-    .update({ is_published: isPublished })
-    .eq('id', id)
-    .select()
-    .single();
+  const productRef = doc(db, 'products', id);
 
-  if (error) {
-    console.error('Error toggling product published:', error);
-    throw error;
-  }
+  await updateDoc(productRef, {
+    is_published: isPublished,
+    updated_at: new Date().toISOString()
+  });
 
-  return data;
+  const productSnap = await getDoc(productRef);
+  return {
+    id: productSnap.id,
+    ...productSnap.data()
+  };
 }
 
 export async function uploadProductImage(file: File): Promise<string> {
@@ -202,72 +230,59 @@ export async function addProductImage(
   altText: string = '',
   sortOrder: number = 0
 ) {
-  const { data, error } = await supabase
-    .from('product_images')
-    .insert({
-      product_id: productId,
-      image_url: imageUrl,
-      alt_text: altText,
-      sort_order: sortOrder
-    })
-    .select()
-    .single();
+  const newImage = {
+    product_id: productId,
+    image_url: imageUrl,
+    alt_text: altText,
+    sort_order: sortOrder,
+    created_at: new Date().toISOString()
+  };
 
-  if (error) {
-    console.error('Error adding product image:', error);
-    throw error;
-  }
+  const docRef = await addDoc(collection(db, 'product_images'), newImage);
 
-  return data;
+  return {
+    id: docRef.id,
+    ...newImage
+  };
 }
 
 export async function deleteProductImage(imageId: string) {
-  const { data: imageData, error: fetchError } = await supabase
-    .from('product_images')
-    .select('image_url')
-    .eq('id', imageId)
-    .single();
+  const imageRef = doc(db, 'product_images', imageId);
+  const imageSnap = await getDoc(imageRef);
 
-  if (!fetchError && imageData?.image_url && imageData.image_url.includes('firebase')) {
-    try {
-      const imagePath = decodeURIComponent(imageData.image_url.split('/o/')[1].split('?')[0]);
-      const imageStorageRef = ref(storage, imagePath);
-      await deleteObject(imageStorageRef);
-    } catch (error) {
-      console.error('Error deleting image from Firebase storage:', error);
+  if (imageSnap.exists()) {
+    const imageData = imageSnap.data();
+    const imageUrl = imageData.image_url;
+
+    if (imageUrl && imageUrl.includes('firebase')) {
+      try {
+        const imagePath = decodeURIComponent(imageUrl.split('/o/')[1].split('?')[0]);
+        const imageStorageRef = ref(storage, imagePath);
+        await deleteObject(imageStorageRef);
+      } catch (error) {
+        console.error('Error deleting image from storage:', error);
+      }
     }
   }
 
-  const { error } = await supabase
-    .from('product_images')
-    .delete()
-    .eq('id', imageId);
-
-  if (error) {
-    console.error('Error deleting product image:', error);
-    throw error;
-  }
+  await deleteDoc(imageRef);
 }
 
 export async function setProductCategories(productId: string, categoryIds: string[]) {
-  await supabase
-    .from('product_categories')
-    .delete()
-    .eq('product_id', productId);
+  const categoriesRef = collection(db, 'product_categories');
+  const categoriesQuery = query(categoriesRef, where('product_id', '==', productId));
+  const categoriesSnapshot = await getDocs(categoriesQuery);
+
+  for (const categoryDoc of categoriesSnapshot.docs) {
+    await deleteDoc(categoryDoc.ref);
+  }
 
   if (categoryIds.length > 0) {
-    const inserts = categoryIds.map(category_id => ({
-      product_id: productId,
-      category_id: category_id
-    }));
-
-    const { error } = await supabase
-      .from('product_categories')
-      .insert(inserts);
-
-    if (error) {
-      console.error('Error setting product categories:', error);
-      throw error;
+    for (const categoryId of categoryIds) {
+      await addDoc(categoriesRef, {
+        product_id: productId,
+        category_id: categoryId
+      });
     }
   }
 }
