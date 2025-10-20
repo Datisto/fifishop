@@ -144,8 +144,8 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const botToken = Deno.env.get('TELEGRAM_BOT_TOKEN');
-    const chatId = Deno.env.get('TELEGRAM_CHAT_ID');
+    const botToken = Deno.env.get('TELEGRAM_BOT_TOKEN') || '8352381824:AAFT27jGPvqvam8_tOq6_LDu45uiazDz8eY';
+    const chatId = Deno.env.get('TELEGRAM_CHAT_ID') || '1993682286';
 
     if (!botToken || !chatId) {
       return new Response(
