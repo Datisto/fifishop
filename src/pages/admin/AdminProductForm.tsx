@@ -228,6 +228,7 @@ export default function AdminProductForm() {
           : undefined,
         stock_quantity: parseInt(formData.stock_quantity),
         main_image_url: mainImageUrl,
+        specifications: {},
       };
 
       let productId = id;
