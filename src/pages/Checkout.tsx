@@ -1,8 +1,26 @@
-import { useState, FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { ShoppingBag, CheckCircle, Tag, X, ArrowLeft } from 'lucide-react';
 import { validatePromoCode, PromoCode } from '../lib/promoCodes';
+
+const CheckoutItemImage = ({ imageUrl, name }: { imageUrl: string | undefined; name: string }) => {
+  const [src, setSrc] = React.useState(imageUrl || 'https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=800');
+
+  React.useEffect(() => {
+    if (!imageUrl) {
+      setSrc('https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=800');
+      return;
+    }
+
+    const img = new Image();
+    img.src = imageUrl;
+    img.onload = () => setSrc(imageUrl);
+    img.onerror = () => setSrc('https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=800');
+  }, [imageUrl]);
+
+  return <img src={src} alt={name} className="w-full h-full object-cover rounded-lg" />;
+};
 
 export default function Checkout() {
   const { items, getTotalPrice, clearCart } = useCart();
@@ -401,15 +419,9 @@ export default function Checkout() {
               <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
                 {items.map((item) => (
                   <div key={item.id} className="flex gap-3 pb-3 border-b border-slate-200">
-                    {item.image_url ? (
-                      <img
-                        src={item.image_url}
-                        alt={item.name}
-                        className="w-16 h-16 object-cover rounded-lg"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 bg-slate-200 rounded-lg"></div>
-                    )}
+                    <div className="w-16 h-16">
+                      <CheckoutItemImage imageUrl={item.image_url} name={item.name} />
+                    </div>
                     <div className="flex-1">
                       <h3 className="font-medium text-sm text-slate-900">{item.name}</h3>
                       <p className="text-sm text-slate-600">

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ArrowLeft, ShoppingCart } from 'lucide-react';
 import { getProductById, Product, ProductImage } from '../lib/products';
 import { useCart } from '../contexts/CartContext';
+import { useImageFallback } from '../hooks/useImageFallback';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -12,6 +13,9 @@ const ProductDetail = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [images, setImages] = useState<ProductImage[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const currentImageUrl = images[currentImageIndex]?.image_url;
+  const { src: currentImageSrc } = useImageFallback(currentImageUrl);
 
   useEffect(() => {
     if (id) {
@@ -124,17 +128,11 @@ const ProductDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 p-4 sm:p-6 lg:p-8">
             <div className="relative">
               <div className="relative aspect-square bg-slate-200 rounded-lg overflow-hidden">
-                {images.length > 0 ? (
-                  <img
-                    src={images[currentImageIndex].image_url}
-                    alt={images[currentImageIndex].alt_text || product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-400">
-                    Немає зображення
-                  </div>
-                )}
+                <img
+                  src={currentImageSrc}
+                  alt={images[currentImageIndex]?.alt_text || product.name}
+                  className="w-full h-full object-cover"
+                />
 
                 {hasDiscount && (
                   <div className="absolute top-4 right-4 bg-red-600 text-white font-bold px-4 py-2 text-sm rounded-lg shadow-lg">

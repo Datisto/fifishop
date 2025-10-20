@@ -1,7 +1,26 @@
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { Minus, Plus, Trash2, Undo2, ShoppingBag } from 'lucide-react';
 import Header from '../components/Header';
+
+const CartItemImage = ({ imageUrl, name }: { imageUrl: string | undefined; name: string }) => {
+  const [src, setSrc] = React.useState(imageUrl || 'https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=800');
+
+  React.useEffect(() => {
+    if (!imageUrl) {
+      setSrc('https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=800');
+      return;
+    }
+
+    const img = new Image();
+    img.src = imageUrl;
+    img.onload = () => setSrc(imageUrl);
+    img.onerror = () => setSrc('https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=800');
+  }, [imageUrl]);
+
+  return <img src={src} alt={name} className="w-32 h-32 object-cover rounded-lg" />;
+};
 
 export default function Cart() {
   const { items, updateQuantity, removeItem, getTotalPrice, undoAction, undo, clearUndo } =
@@ -81,17 +100,7 @@ export default function Cart() {
                   className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-xl transition-shadow shadow-lg"
                 >
                   <div className="flex gap-6">
-                    {item.image_url ? (
-                      <img
-                        src={item.image_url}
-                        alt={item.name}
-                        className="w-32 h-32 object-cover rounded-lg"
-                      />
-                    ) : (
-                      <div className="w-32 h-32 bg-slate-200 rounded-lg flex items-center justify-center">
-                        <span className="text-slate-400">Без фото</span>
-                      </div>
-                    )}
+                    <CartItemImage imageUrl={item.image_url} name={item.name} />
 
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-2">

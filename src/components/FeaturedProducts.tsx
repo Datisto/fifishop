@@ -110,7 +110,7 @@ const FeaturedProducts = ({ selectedCategory, searchQuery }: FeaturedProductsPro
 
     return {
       ...p,
-      image: firstImage || 'https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=400',
+      image: firstImage,
       onSale: !!p.discount_price,
       category: p.product_categories?.[0]?.categories?.name?.toUpperCase() || ''
     };

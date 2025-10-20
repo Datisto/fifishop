@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
 import { Product } from '../lib/products';
 import { useCart } from '../contexts/CartContext';
+import { useImageFallback } from '../hooks/useImageFallback';
 
 interface ProductCardProps {
   product: Product & {
@@ -14,9 +15,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { addItem } = useCart();
   const hasDiscount = product.discount_price && product.discount_price < product.price;
   const displayPrice = hasDiscount ? product.discount_price : product.price;
-  const imageUrl = product.product_images && product.product_images.length > 0
+  const rawImageUrl = product.product_images && product.product_images.length > 0
     ? product.product_images[0].image_url
     : product.main_image_url || '';
+  const { src: imageUrl } = useImageFallback(rawImageUrl);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -46,17 +48,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
       onClick={() => navigate(`/product/${product.id}`)}
       className="bg-white/95 rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group relative cursor-pointer">
       <div className="relative h-28 sm:h-32 overflow-hidden bg-slate-200">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
-            Немає фото
-          </div>
-        )}
+        <img
+          src={imageUrl}
+          alt={product.name}
+          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+        />
         {hasDiscount && (
           <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-red-600 text-white font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded-lg shadow-lg backdrop-blur-sm">
             РОЗПРОДАЖ
