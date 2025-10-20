@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { getBanners, Banner } from '../lib/banners';
 
 interface HeroProps {
@@ -106,12 +107,23 @@ const Hero = ({ onCategorySelect }: HeroProps) => {
                       Переглянути
                     </button>
                   ) : (
-                    <a
-                      href={banner.link_url}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-xl sm:rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105 text-sm sm:text-base inline-block"
-                    >
-                      Переглянути
-                    </a>
+                    banner.link_url?.startsWith('http') || banner.link_url?.startsWith('//') ? (
+                      <a
+                        href={banner.link_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-xl sm:rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105 text-sm sm:text-base inline-block"
+                      >
+                        Переглянути
+                      </a>
+                    ) : (
+                      <Link
+                        to={banner.link_url || '/'}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-xl sm:rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105 text-sm sm:text-base inline-block"
+                      >
+                        Переглянути
+                      </Link>
+                    )
                   )
                 )}
               </div>
