@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { ShoppingBag, CheckCircle, Tag, X, ArrowLeft } from 'lucide-react';
 import { validatePromoCode, PromoCode } from '../lib/promoCodes';
+import CityAutocomplete from '../components/CityAutocomplete';
+import WarehouseSelect from '../components/WarehouseSelect';
+import { NovaPoshtaCity, NovaPoshtaWarehouse, formatCityDisplay } from '../lib/novaPoshta';
 
 const CheckoutItemImage = ({ imageUrl, name }: { imageUrl: string | undefined; name: string }) => {
   const [src, setSrc] = React.useState(imageUrl || 'https://images.pexels.com/photos/842535/pexels-photo-842535.jpeg?auto=compress&cs=tinysrgb&w=800');
@@ -33,10 +36,16 @@ export default function Checkout() {
     lastName: '',
     email: '',
     phone: '',
+    comment: '',
+  });
+
+  const [deliveryType, setDeliveryType] = useState<'nova_poshta' | 'manual'>('nova_poshta');
+  const [selectedCity, setSelectedCity] = useState<NovaPoshtaCity | null>(null);
+  const [selectedWarehouse, setSelectedWarehouse] = useState<NovaPoshtaWarehouse | null>(null);
+  const [manualAddress, setManualAddress] = useState({
     city: '',
     address: '',
     postalCode: '',
-    comment: '',
   });
 
   const [promoCodeInput, setPromoCodeInput] = useState('');
@@ -57,6 +66,25 @@ export default function Checkout() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const handleManualAddressChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setManualAddress((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleDeliveryTypeChange = (type: 'nova_poshta' | 'manual') => {
+    setDeliveryType(type);
+    if (type === 'nova_poshta') {
+      setManualAddress({ city: '', address: '', postalCode: '' });
+    } else {
+      setSelectedCity(null);
+      setSelectedWarehouse(null);
+    }
   };
 
   const getSessionId = () => {
@@ -155,6 +183,16 @@ export default function Checkout() {
       const discountAmount = getTotalDiscount();
       const totalAmount = getFinalTotal();
 
+      if (deliveryType === 'nova_poshta' && (!selectedCity || !selectedWarehouse)) {
+        alert('Будь ласка, оберіть місто та відділення Нової Пошти');
+        return;
+      }
+
+      if (deliveryType === 'manual' && (!manualAddress.city || !manualAddress.address)) {
+        alert('Будь ласка, заповніть адресу доставки');
+        return;
+      }
+
       const orderNumber = `ORD-${Date.now()}`;
 
       const orderItems = items.map((item) => ({
@@ -189,9 +227,12 @@ export default function Checkout() {
           last_name: formData.lastName,
           email: formData.email,
           phone: formData.phone,
-          city: formData.city,
-          address: formData.address,
-          postal_code: formData.postalCode,
+          delivery_type: deliveryType,
+          city: deliveryType === 'nova_poshta' && selectedCity ? formatCityDisplay(selectedCity) : manualAddress.city,
+          address: deliveryType === 'nova_poshta' && selectedWarehouse ? `Відділення №${selectedWarehouse.Number}: ${selectedWarehouse.ShortAddress}` : manualAddress.address,
+          postal_code: deliveryType === 'manual' ? manualAddress.postalCode : '',
+          nova_poshta_city_ref: deliveryType === 'nova_poshta' && selectedCity ? selectedCity.Ref : null,
+          nova_poshta_warehouse_ref: deliveryType === 'nova_poshta' && selectedWarehouse ? selectedWarehouse.Ref : null,
           comment: formData.comment,
           items: orderItems,
           subtotal_amount: subtotalAmount,
@@ -342,50 +383,97 @@ export default function Checkout() {
               </div>
 
               <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h2 className="text-xl font-bold text-slate-900 mb-4">Адреса доставки</h2>
+                <h2 className="text-xl font-bold text-slate-900 mb-4">Доставка</h2>
 
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Місто *
-                    </label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                  <div className="flex gap-4 mb-6">
+                    <button
+                      type="button"
+                      onClick={() => handleDeliveryTypeChange('nova_poshta')}
+                      className={`flex-1 py-3 px-4 rounded-lg border-2 font-medium transition-colors ${
+                        deliveryType === 'nova_poshta'
+                          ? 'border-blue-600 bg-blue-50 text-blue-700'
+                          : 'border-slate-300 bg-white text-slate-700 hover:border-slate-400'
+                      }`}
+                    >
+                      Нова Пошта
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeliveryTypeChange('manual')}
+                      className={`flex-1 py-3 px-4 rounded-lg border-2 font-medium transition-colors ${
+                        deliveryType === 'manual'
+                          ? 'border-blue-600 bg-blue-50 text-blue-700'
+                          : 'border-slate-300 bg-white text-slate-700 hover:border-slate-400'
+                      }`}
+                    >
+                      Інша адреса
+                    </button>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Адреса *
-                    </label>
-                    <input
-                      type="text"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      required
-                      placeholder="Вулиця, будинок, квартира"
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
+                  {deliveryType === 'nova_poshta' ? (
+                    <>
+                      <CityAutocomplete
+                        value={selectedCity}
+                        onChange={(city) => {
+                          setSelectedCity(city);
+                          setSelectedWarehouse(null);
+                        }}
+                        required
+                      />
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Поштовий індекс
-                    </label>
-                    <input
-                      type="text"
-                      name="postalCode"
-                      value={formData.postalCode}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
+                      <WarehouseSelect
+                        cityRef={selectedCity?.Ref || null}
+                        value={selectedWarehouse}
+                        onChange={setSelectedWarehouse}
+                        required
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Місто *
+                        </label>
+                        <input
+                          type="text"
+                          name="city"
+                          value={manualAddress.city}
+                          onChange={handleManualAddressChange}
+                          required
+                          className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Адреса *
+                        </label>
+                        <input
+                          type="text"
+                          name="address"
+                          value={manualAddress.address}
+                          onChange={handleManualAddressChange}
+                          required
+                          placeholder="Вулиця, будинок, квартира"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Поштовий індекс
+                        </label>
+                        <input
+                          type="text"
+                          name="postalCode"
+                          value={manualAddress.postalCode}
+                          onChange={handleManualAddressChange}
+                          className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+                    </>
+                  )}
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">

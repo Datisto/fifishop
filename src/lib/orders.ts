@@ -11,6 +11,9 @@ export interface Order {
   address: string;
   postal_code?: string;
   comment?: string;
+  delivery_type?: string;
+  nova_poshta_city_ref?: string;
+  nova_poshta_warehouse_ref?: string;
   subtotal_amount: number;
   discount_amount: number;
   total_amount: number;
@@ -50,6 +53,9 @@ export interface CreateOrderData {
   address: string;
   postal_code?: string;
   comment?: string;
+  delivery_type?: string;
+  nova_poshta_city_ref?: string;
+  nova_poshta_warehouse_ref?: string;
   items: OrderItem[];
   promo_codes: OrderPromoCode[];
   subtotal_amount: number;
@@ -67,6 +73,9 @@ export async function createOrder(orderData: CreateOrderData): Promise<Order> {
     address: orderData.address,
     postal_code: orderData.postal_code || '',
     comment: orderData.comment || null,
+    delivery_type: orderData.delivery_type || 'manual',
+    nova_poshta_city_ref: orderData.nova_poshta_city_ref || null,
+    nova_poshta_warehouse_ref: orderData.nova_poshta_warehouse_ref || null,
     subtotal_amount: orderData.subtotal_amount,
     discount_amount: orderData.discount_amount,
     total_amount: orderData.total_amount,
@@ -75,7 +84,7 @@ export async function createOrder(orderData: CreateOrderData): Promise<Order> {
     customer_email: orderData.email,
     customer_phone: orderData.phone,
     shipping_address: `${orderData.city}, ${orderData.address}${orderData.postal_code ? ', ' + orderData.postal_code : ''}`,
-    shipping_method: 'standard',
+    shipping_method: orderData.delivery_type === 'nova_poshta' ? 'nova_poshta' : 'standard',
     payment_method: 'cash',
   };
 

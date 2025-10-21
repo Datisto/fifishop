@@ -28,9 +28,12 @@ interface OrderData {
   last_name: string;
   email: string;
   phone: string;
+  delivery_type?: string;
   city: string;
   address: string;
   postal_code?: string;
+  nova_poshta_city_ref?: string;
+  nova_poshta_warehouse_ref?: string;
   comment?: string;
   items: OrderItem[];
   subtotal_amount: number;
@@ -48,6 +51,9 @@ function formatOrderMessage(order: OrderData): string {
   message += `Телефон: ${order.phone}\n\n`;
 
   message += `📍 <b>АДРЕСА ДОСТАВКИ:</b>\n`;
+  if (order.delivery_type === 'nova_poshta') {
+    message += `🚚 <b>Нова Пошта</b>\n`;
+  }
   const addressParts = [order.city, order.address];
   if (order.postal_code) {
     addressParts.push(order.postal_code);
