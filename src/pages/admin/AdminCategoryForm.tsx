@@ -1,4 +1,4 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useEffect, useState, FormEvent, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 import {
@@ -7,9 +7,10 @@ import {
   getCategoryById,
   getCategories,
   uploadCategoryIcon,
+  checkSlugAvailability,
   Category,
 } from '../../lib/categories';
-import { Save, ArrowLeft, Upload, X } from 'lucide-react';
+import { Save, ArrowLeft, Upload, X, AlertCircle, CheckCircle } from 'lucide-react';
 
 export default function AdminCategoryForm() {
   const { id } = useParams();
@@ -20,6 +21,9 @@ export default function AdminCategoryForm() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadingHeader, setUploadingHeader] = useState(false);
+  const [slugPreview, setSlugPreview] = useState('');
+  const [slugStatus, setSlugStatus] = useState<'checking' | 'available' | 'taken' | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -79,6 +83,24 @@ export default function AdminCategoryForm() {
     }
   };
 
+  const checkSlug = useCallback(async (name: string) => {
+    if (!name.trim()) {
+      setSlugPreview('');
+      setSlugStatus(null);
+      return;
+    }
+
+    setSlugStatus('checking');
+    try {
+      const { available, suggestedSlug } = await checkSlugAvailability(name, id || null);
+      setSlugPreview(suggestedSlug);
+      setSlugStatus(available ? 'available' : 'taken');
+    } catch (error) {
+      console.error('Error checking slug:', error);
+      setSlugStatus(null);
+    }
+  }, [id]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -87,6 +109,10 @@ export default function AdminCategoryForm() {
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }));
+
+    if (name === 'name') {
+      checkSlug(value);
+    }
   };
 
   const handleIconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,9 +157,20 @@ export default function AdminCategoryForm() {
     setFormData((prev) => ({ ...prev, header_icon_url: '' }));
   };
 
+  const getErrorMessage = (error: any): string => {
+    if (error?.code === '23505' || error?.message?.includes('duplicate') || error?.message?.includes('409')) {
+      return 'Категорія з такою назвою вже існує. Спробуйте іншу назву або система автоматично додасть унікальний ідентифікатор.';
+    }
+    if (error?.message) {
+      return error.message;
+    }
+    return 'Помилка збереження категорії. Спробуйте ще раз.';
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null);
 
     try {
       const categoryData = {
@@ -150,9 +187,12 @@ export default function AdminCategoryForm() {
       }
 
       navigate('/admin/categories');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving category:', error);
-      alert('Помилка збереження категорії');
+      const message = getErrorMessage(error);
+      setErrorMessage(message);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setLoading(false);
     }
@@ -185,12 +225,28 @@ export default function AdminCategoryForm() {
           </div>
         </div>
 
+        {errorMessage && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-red-900 mb-1">Помилка збереження</h3>
+              <p className="text-red-700 text-sm">{errorMessage}</p>
+            </div>
+            <button
+              onClick={() => setErrorMessage(null)}
+              className="text-red-400 hover:text-red-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-4">Основна інформація</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Назва категорії *
                 </label>
@@ -202,6 +258,32 @@ export default function AdminCategoryForm() {
                   required
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+                {slugPreview && (
+                  <div className="mt-2 flex items-center gap-2 text-sm">
+                    {slugStatus === 'checking' && (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
+                        <span className="text-slate-600">Перевірка доступності...</span>
+                      </>
+                    )}
+                    {slugStatus === 'available' && (
+                      <>
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <span className="text-slate-600">
+                          URL-адреса: <span className="font-mono text-green-700">{slugPreview}</span>
+                        </span>
+                      </>
+                    )}
+                    {slugStatus === 'taken' && (
+                      <>
+                        <AlertCircle className="w-4 h-4 text-amber-600" />
+                        <span className="text-slate-600">
+                          Схожа назва існує. Буде використано: <span className="font-mono text-amber-700">{slugPreview}</span>
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div>

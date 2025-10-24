@@ -49,7 +49,7 @@ export async function getCategoryById(id: string) {
 }
 
 export async function createCategory(category: Partial<Category>) {
-  const slug = generateSlug(category.name || '');
+  const slug = await generateUniqueSlug(category.name || '', null);
 
   const { data, error } = await supabase
     .from('categories')
@@ -68,9 +68,15 @@ export async function createCategory(category: Partial<Category>) {
 }
 
 export async function updateCategory(id: string, category: Partial<Category>) {
+  const updateData = { ...category };
+
+  if (category.name) {
+    updateData.slug = await generateUniqueSlug(category.name, id);
+  }
+
   const { data, error } = await supabase
     .from('categories')
-    .update(category)
+    .update(updateData)
     .eq('id', id)
     .select()
     .single();
@@ -182,4 +188,59 @@ function generateSlug(text: string): string {
     .replace(/[^\w\s-]/g, '')
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+export async function generateUniqueSlug(name: string, excludeId: string | null = null): Promise<string> {
+  const baseSlug = generateSlug(name);
+
+  if (!baseSlug) {
+    return 'category';
+  }
+
+  let slug = baseSlug;
+  let counter = 1;
+  let isUnique = false;
+
+  while (!isUnique) {
+    let query = supabase
+      .from('categories')
+      .select('id')
+      .eq('slug', slug);
+
+    if (excludeId) {
+      query = query.neq('id', excludeId);
+    }
+
+    const { data, error } = await query.maybeSingle();
+
+    if (error) throw error;
+
+    if (!data) {
+      isUnique = true;
+    } else {
+      counter++;
+      slug = `${baseSlug}-${counter}`;
+    }
+  }
+
+  return slug;
+}
+
+export async function checkSlugAvailability(name: string, excludeId: string | null = null): Promise<{ available: boolean; suggestedSlug: string }> {
+  const baseSlug = generateSlug(name);
+
+  let query = supabase
+    .from('categories')
+    .select('id')
+    .eq('slug', baseSlug);
+
+  if (excludeId) {
+    query = query.neq('id', excludeId);
+  }
+
+  const { data } = await query.maybeSingle();
+  const available = !data;
+  const suggestedSlug = available ? baseSlug : await generateUniqueSlug(name, excludeId);
+
+  return { available, suggestedSlug };
 }
