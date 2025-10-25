@@ -129,7 +129,7 @@ const FeaturedProducts = ({ selectedCategory, searchQuery }: FeaturedProductsPro
     );
   }
 
-  const displayProducts = filteredProducts.slice(0, 8);
+  const displayProducts = filteredProducts;
 
   return (
     <section ref={sectionRef} data-products-section className="relative bg-gradient-to-b from-slate-400/0 via-slate-400/20 to-slate-400/60 py-6 sm:py-8">
@@ -139,6 +139,11 @@ const FeaturedProducts = ({ selectedCategory, searchQuery }: FeaturedProductsPro
             {searchQuery && searchQuery.trim() ? 'РЕЗУЛЬТАТИ ПОШУКУ' : (selectedCategory || 'РЕКОМЕНДОВАНІ ТОВАРИ')}
             <div className="absolute -bottom-2 sm:-bottom-3 left-0 right-0 h-1 sm:h-1.5 bg-yellow-400 rounded-full shadow-lg"></div>
           </h2>
+          {displayProducts.length > 0 && (
+            <p className="mt-4 text-sm sm:text-base text-white/80 drop-shadow">
+              Знайдено товарів: {displayProducts.length}
+            </p>
+          )}
         </div>
 
         {displayProducts.length > 0 ? (
