@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
 import PromotionalTiles from '../components/PromotionalTiles';
 import FeaturedProducts from '../components/FeaturedProducts';
+import Footer from '../components/Footer';
 
 const Home = () => {
   const location = useLocation();
@@ -42,22 +43,7 @@ const Home = () => {
       <Hero onCategorySelect={handleCategorySelect} />
       <PromotionalTiles onCategorySelect={handleCategorySelect} />
       <FeaturedProducts selectedCategory={selectedCategory} searchQuery={submittedQuery} />
-
-      <footer className="bg-slate-900/70 backdrop-blur-md py-8 mt-16">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-slate-500">
-              © 2025 Всі права захищені
-            </p>
-            <Link
-              to="/admin/login"
-              className="text-[10px] text-slate-600/40 hover:text-slate-500/60 transition-colors"
-            >
-              •
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 };
