@@ -43,7 +43,7 @@ export async function getProducts(
 ) {
   let query = supabase
     .from('products')
-    .select('*, product_images(id, image_url, sort_order)', { count: 'exact' })
+    .select('*, product_images(id, image_url, sort_order), product_categories(category_id)', { count: 'exact' })
     .order('created_at', { ascending: false });
 
   if (search) {

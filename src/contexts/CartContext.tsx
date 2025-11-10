@@ -10,6 +10,7 @@ export interface CartItem {
   sku: string;
   stock_quantity: number;
   description?: string;
+  category_id?: string;
 }
 
 interface UndoAction {

@@ -28,6 +28,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
       return;
     }
 
+    const categoryId = product.product_categories && product.product_categories.length > 0
+      ? product.product_categories[0].category_id
+      : undefined;
+
     addItem({
       id: product.id,
       name: product.name,
@@ -37,7 +41,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
       image_url: imageUrl,
       sku: product.sku,
       stock_quantity: product.stock_quantity,
-      description: product.description
+      description: product.description,
+      category_id: categoryId
     });
 
     navigate('/cart');
